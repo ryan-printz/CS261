@@ -16,6 +16,11 @@
 *.user
 *.suo
 *.sdf
+*.ipch
+*.exe
+*.ilk
+*.obj
+*.idb
 
 # Builds
 *.res
