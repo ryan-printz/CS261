@@ -1,0 +1,32 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual Studio 2010
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Source", "Source", "{DC369597-3BD9-46B1-9A32-F36C1EE1BA02}"
+	ProjectSection(SolutionItems) = preProject
+		source\IConnection.cpp = source\IConnection.cpp
+		source\Types.h = source\Types.h
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "client", "client\client.vcxproj", "{E341B12D-29DC-4223-98ED-96AA8A3A16B3}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "server", "server\server.vcxproj", "{007DC164-6899-4133-A4E9-A1E3D6145968}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Win32 = Debug|Win32
+		Release|Win32 = Release|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{E341B12D-29DC-4223-98ED-96AA8A3A16B3}.Debug|Win32.ActiveCfg = Debug|Win32
+		{E341B12D-29DC-4223-98ED-96AA8A3A16B3}.Debug|Win32.Build.0 = Debug|Win32
+		{E341B12D-29DC-4223-98ED-96AA8A3A16B3}.Release|Win32.ActiveCfg = Release|Win32
+		{E341B12D-29DC-4223-98ED-96AA8A3A16B3}.Release|Win32.Build.0 = Release|Win32
+		{007DC164-6899-4133-A4E9-A1E3D6145968}.Debug|Win32.ActiveCfg = Debug|Win32
+		{007DC164-6899-4133-A4E9-A1E3D6145968}.Debug|Win32.Build.0 = Debug|Win32
+		{007DC164-6899-4133-A4E9-A1E3D6145968}.Release|Win32.ActiveCfg = Release|Win32
+		{007DC164-6899-4133-A4E9-A1E3D6145968}.Release|Win32.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

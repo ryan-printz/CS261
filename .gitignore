@@ -11,3 +11,18 @@
 *.lai
 *.la
 *.a
+
+# Visual Studio User Options and other build files
+*.user
+*.suo
+*.sdf
+
+# Builds
+*.res
+*.manifest
+*.lastbuildstate
+*.unsuccessfulbuild
+*.rc
+*.tlog
+*.log
+*.pdb
