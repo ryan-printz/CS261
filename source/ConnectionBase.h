@@ -1,29 +1,18 @@
 #pragma once
 
 #include "IConnection.h"
-#include "winsock2.h"
+#include "Socket.h"
 
 class ConnectionBase : public IConnection
 {
 protected:
-	struct WinSockData 
-	{
-		WinSockData();
-		~WinSockData();
-
-		WSAData m_wsData;
-	};
-
-	static WinSockData s_winSock;
-
-	SOCKET		m_socket;
-	sockaddr_in m_socketAddress;
+	Socket m_connection;
 
 public:
 	ConnectionBase();
 	~ConnectionBase();
 
-	virtual int send(ubyte * buffer, int bufferlen);
-	virtual int recv(ubyte * buffer, int bufferlen);
+	virtual int send(ubyte * buffer, uint bufferlen);
+	virtual int recv(ubyte * buffer, uint bufferlen);
 	virtual std::string connectionInfo() const;
 };

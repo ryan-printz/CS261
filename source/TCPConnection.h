@@ -1,19 +1,21 @@
-#include "ConnectionBase.h"
+#include "IConnection.h"
+#include "Socket.h"
 
-class TCPConnection : public ConnectionBase
+class TCPConnection : public IConnection
 {
-protected:
-	SOCKET		m_client;
-	sockaddr_in	m_clientAddress;
-
 public:
-	TCPConnection(char * localIP, hostent * localhost, uint port);
+	// Constructor. takes a reference to a Socket 
+	// in listening mode.
+	TCPConnection(Socket * m_listener);
 
-	// blocks until connect.
-	void connect();
+	bool connect();
 	void close();
 
-	virtual int send(ubyte * buffer, int bufferlen);
-	virtual int recv(ubyte * buffer, int bufferlen);
+	virtual int send(ubyte * buffer, uint bufferlen);
+	virtual int recieve(ubyte * buffer, uint bufferlen);
 	virtual std::string connectionInfo() const;
+
+protected:
+	Socket * m_listener;
+	Socket m_connection;
 };

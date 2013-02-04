@@ -78,13 +78,13 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\source\ConnectionBase.cpp" />
+    <ClCompile Include="..\source\Socket.cpp" />
     <ClCompile Include="..\source\TCPConnection.cpp" />
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\source\ConnectionBase.h" />
     <ClInclude Include="..\source\IConnection.h" />
+    <ClInclude Include="..\source\Socket.h" />
     <ClInclude Include="..\source\TCPConnection.h" />
     <ClInclude Include="..\source\Types.h" />
   </ItemGroup>

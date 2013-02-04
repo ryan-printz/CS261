@@ -3,12 +3,12 @@ Microsoft Visual Studio Solution File, Format Version 11.00
 # Visual Studio 2010
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Source", "Source", "{DC369597-3BD9-46B1-9A32-F36C1EE1BA02}"
 	ProjectSection(SolutionItems) = preProject
-		source\ConnectionBase.cpp = source\ConnectionBase.cpp
-		source\ConnectionBase.h = source\ConnectionBase.h
 		source\DropConnectionDecorator.h = source\DropConnectionDecorator.h
 		source\IConnection.h = source\IConnection.h
 		source\IDecorator.h = source\IDecorator.h
 		source\LatencyConnectionDecorator.h = source\LatencyConnectionDecorator.h
+		source\Socket.cpp = source\Socket.cpp
+		source\Socket.h = source\Socket.h
 		source\TCPConnection.cpp = source\TCPConnection.cpp
 		source\TCPConnection.h = source\TCPConnection.h
 		source\Types.h = source\Types.h

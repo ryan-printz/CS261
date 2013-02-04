@@ -26,12 +26,12 @@ ConnectionBase::ConnectionBase()
 ConnectionBase::~ConnectionBase()
 {}
 
-int ConnectionBase::send(ubyte * buffer, int bufferlen)
+int ConnectionBase::send(ubyte * buffer, uint bufferlen)
 {
 	return 0;
 }
 
-int ConnectionBase::recv(ubyte * buffer, int bufferlen)
+int ConnectionBase::recv(ubyte * buffer, uint bufferlen)
 {
 	return 0;
 }

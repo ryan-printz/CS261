@@ -2,13 +2,13 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="..\source\ConnectionBase.cpp" />
     <ClCompile Include="..\source\TCPConnection.cpp" />
+    <ClCompile Include="..\source\Socket.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\source\ConnectionBase.h" />
     <ClInclude Include="..\source\IConnection.h" />
     <ClInclude Include="..\source\Types.h" />
     <ClInclude Include="..\source\TCPConnection.h" />
+    <ClInclude Include="..\source\Socket.h" />
   </ItemGroup>
 </Project>

@@ -1,68 +1,50 @@
 #include "TCPConnection.h"
 #include <iostream>
 
-TCPConnection::TCPConnection(char * localIP, hostent * localhost, uint port)
+TCPConnection::TCPConnection(Socket * listener)
+	: m_listener(listener)
+{}
+
+bool TCPConnection::connect()
 {
-	// local endpoint
-	m_socketAddress.sin_family = AF_INET;
-	m_socketAddress.sin_port = htons(port);
-	m_socketAddress.sin_addr.s_addr = inet_addr(localIP);
+	Socket accepted = m_listener->accept();
 
-	// create the socket
-	m_socket = WSASocket(AF_INET, SOCK_STREAM, IPPROTO_TCP, NULL, 0, 0);
+	if( !accepted.invalid() )
+		m_connection = accepted;
 
-	if(INVALID_SOCKET == m_socket)
-	{
-		std::cout << "Socket call failed! " << WSAGetLastError() << std::endl;
-		WSACleanup();
-		return;
-	}
-
-	int result = bind(m_socket, (SOCKADDR*)&m_socketAddress, sizeof(m_socketAddress));
-	if(SOCKET_ERROR == result)
-		std::cout << "Bind call failed! " << WSAGetLastError() << std::endl;
+	return !accepted.invalid();
 }
 
-void TCPConnection::connect()
+int TCPConnection::recieve(ubyte * buffer, uint bufferlen)
 {
-	int result = listen(m_socket, 10);
-	if(SOCKET_ERROR == result)
-		std::cout << "Listen call failed! " << WSAGetLastError() << std::endl;
-
-	int endpointSize = sizeof(m_clientAddress);
-	m_client = accept(m_socket, (SOCKADDR*)&m_clientAddress, &endpointSize);
-	if(SOCKET_ERROR == result)
-		std::cout << "Accept call failed! " << WSAGetLastError() << std::endl;
-}
-
-int TCPConnection::recv(ubyte * buffer, int bufferlen)
-{
-	int recieved = ::recv(m_client, (char*)buffer, bufferlen, 0);
-	if(SOCKET_ERROR == recieved)
-	{
-		std::cout << "Socket Error! " << WSAGetLastError() << std::endl;
+	if( m_connection.invalid() ) 
 		return -1;
-	}
 
-	return recieved;
+	return m_connection.recieve(buffer, bufferlen);
 }
 
-int TCPConnection::send(ubyte * buffer, int bufferlen)
+int TCPConnection::send(ubyte * buffer, uint bufferlen)
 {
-	return 0;
+	if( m_connection.invalid() ) 
+		return -1;
+
+	return m_connection.send(buffer, bufferlen);
 }
 
 std::string TCPConnection::connectionInfo() const
 {
-	return ConnectionBase::connectionInfo() + " TCP connection:" + " IP Address:";
-}
+	std::string info = "TCP Connection:";
 
+	if( m_connection.connected() )
+		info + " not connected.";
+	else
+	{
+		char buffer[32];
+		info + " " + m_connection.ipAddress() + ":" + itoa(m_connection.port(), buffer, 10);
+	}
+}
 
 void TCPConnection::close()
 {
-	shutdown(m_client, SD_BOTH);
-	shutdown(m_socket, SD_BOTH);
-
-	closesocket(m_client);
-	closesocket(m_socket);
+	m_connection.cleanUp();	
 }
