@@ -19,7 +19,9 @@ public:
 	bool initializeUDP(char * ipAddress, uint port, uint family = AF_INET);
 	bool cleanUp();
 
+	bool bind();
 	bool bind(const NetAddress * address);
+	bool connect();
 	bool connect(const NetAddress * address);
 	bool listen(ubyte backlog = 10);
 	bool setBlocking(bool blocking);
@@ -28,9 +30,10 @@ public:
 	bool invalid() const;
 	char * ipAddress() const;
 	uint port() const;
+	uint error() const;
 
 	int send(const ubyte * buffer, uint size);
-	int recieve(ubyte * buffer, uint size);
+	int receive(ubyte * buffer, uint size);
 
 	Socket accept();
 

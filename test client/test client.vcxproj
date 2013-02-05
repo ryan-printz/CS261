@@ -10,22 +10,10 @@
       <Platform>Win32</Platform>
     </ProjectConfiguration>
   </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="..\source\IConnection.h" />
-    <ClInclude Include="..\source\IDecorator.h" />
-    <ClInclude Include="..\source\Socket.h" />
-    <ClInclude Include="..\source\TCPConnection.h" />
-    <ClInclude Include="..\source\Types.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="..\source\Socket.cpp" />
-    <ClCompile Include="..\source\TCPConnection.cpp" />
-    <ClCompile Include="main.cpp" />
-  </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{4CFF2BEF-B788-4A91-A4B4-F0AF874903D6}</ProjectGuid>
+    <ProjectGuid>{71EF45B0-7B24-4690-818B-6AFF1DDE5864}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
-    <RootNamespace>test</RootNamespace>
+    <RootNamespace>testclient</RootNamespace>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -51,11 +39,13 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>source;$(IncludePath)</IncludePath>
-    <SourcePath>source;$(SourcePath)</SourcePath>
+    <IncludePath>..\source;$(IncludePath)</IncludePath>
+    <SourcePath>..\source;$(SourcePath)</SourcePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
+    <IncludePath>..\source;$(IncludePath)</IncludePath>
+    <SourcePath>..\source;$(SourcePath)</SourcePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -89,6 +79,18 @@
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
   </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClInclude Include="..\source\IConnection.h" />
+    <ClInclude Include="..\source\IDecorator.h" />
+    <ClInclude Include="..\source\Socket.h" />
+    <ClInclude Include="..\source\TCPConnection.h" />
+    <ClInclude Include="..\source\Types.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\source\Socket.cpp" />
+    <ClCompile Include="..\source\TCPConnection.cpp" />
+    <ClCompile Include="main.cpp" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

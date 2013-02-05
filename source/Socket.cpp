@@ -1,6 +1,8 @@
 #include "Socket.h"
 #include <iostream>
 
+#pragma comment(lib, "WS2_32.lib");
+
 bool initSockets(bool printInfo)
 {
 	static WSAData s_wsData;
@@ -19,9 +21,13 @@ bool initSockets(bool printInfo)
 	return true;
 }
 
+bool cleanSockets()
+{
+	return WSACleanup() != SOCKET_ERROR;
+}
 
 Socket::Socket() 
-	: m_isBlocking(true), m_isConnected(false), m_error(0), m_socket(NULL)
+	: m_isBlocking(true), m_isConnected(false), m_error(0), m_socket(INVALID_SOCKET)
 {}
 
 char * Socket::localIP()
@@ -38,7 +44,7 @@ bool Socket::initializeTCP(char * ipAddress, uint port, uint family)
 	m_address.sin_port = htons(port);
 	m_address.sin_addr.s_addr = inet_addr(ipAddress);
 
-	m_socket = WSASocket(family, SOCK_STREAM, IPPROTO_TCP, NULL, 0, 0);
+	m_socket = socket(family, SOCK_STREAM, IPPROTO_TCP);
 
 	if( m_socket == INVALID_SOCKET )
 	{
@@ -68,11 +74,16 @@ bool Socket::initializeUDP(char * ipAddress, uint port, uint family)
 
 bool Socket::cleanUp()
 {
-	int error = shutdown(m_socket, SD_BOTH);
-	if( error )
+	int error = 0;
+
+	if( m_isConnected )
 	{
-		m_error = WSAGetLastError();
-		return false;
+		error = shutdown(m_socket, SD_BOTH);
+		if( error )
+		{
+			m_error = WSAGetLastError();
+			return false;
+		}
 	}
 
 	error = closesocket(m_socket);
@@ -80,6 +91,20 @@ bool Socket::cleanUp()
 	{
 		m_error = WSAGetLastError();
 		return false;
+	}
+
+	return true;
+}
+
+bool Socket::bind()
+{
+	// bind the socket.
+	int error = ::bind(m_socket, (SOCKADDR*)&m_address, sizeof(m_address));
+
+	if( error )
+	{
+		m_error = WSAGetLastError();
+		return false;			
 	}
 
 	return true;
@@ -96,6 +121,21 @@ bool Socket::bind(const NetAddress * address)
 		return false;			
 	}
 
+	return true;
+}
+
+bool Socket::connect()
+{
+	// connect the socket to an address;
+	int error = ::connect(m_socket, (SOCKADDR*)&m_address, sizeof(m_address));
+
+	if( error )
+	{
+		m_error = WSAGetLastError();
+		return false;
+	}
+
+	m_isConnected = true;
 	return true;
 }
 
@@ -164,7 +204,12 @@ char * Socket::ipAddress() const
 
 uint Socket::port() const
 {
-	return m_address.sin_port;
+	return ntohs(m_address.sin_port);
+}
+
+uint Socket::error() const
+{
+	return m_error;
 }
 
 int Socket::send(const ubyte * buffer, uint size)
@@ -177,23 +222,23 @@ int Socket::send(const ubyte * buffer, uint size)
 	return sent;
 }
 
-int Socket::recieve(ubyte * buffer, uint size)
+int Socket::receive(ubyte * buffer, uint size)
 {
-	int recieved = ::recv(m_socket, (char*)buffer, size, 0);
+	int received = ::recv(m_socket, (char*)buffer, size, 0);
 		
 	// connection closed
-	if( recieved == 0 )
+	if( received == 0 )
 	{
 		m_isConnected = false;
 		return 0;
 	}
-	else if( recieved == SOCKET_ERROR )
+	else if( received == SOCKET_ERROR )
 	{
 		m_error = WSAGetLastError();
-		return recieved;
+		return received;
 	}
 
-	return recieved;
+	return received;
 }
 
 Socket Socket::accept()
