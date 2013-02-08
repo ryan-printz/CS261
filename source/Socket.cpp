@@ -222,10 +222,40 @@ int Socket::send(const ubyte * buffer, uint size)
 	return sent;
 }
 
+int Socket::send(const ubyte * buffer, uint size, NetAddress * address)
+{
+	int sent = ::sendto(m_socket, (char*)buffer, size, 0, (SOCKADDR*)address, sizeof(NetAddress));
+
+	if( sent == SOCKET_ERROR )
+		m_error = WSAGetLastError();
+
+	return sent;
+}
+
 int Socket::receive(ubyte * buffer, uint size)
 {
 	int received = ::recv(m_socket, (char*)buffer, size, 0);
 		
+	// connection closed
+	if( received == 0 )
+	{
+		m_isConnected = false;
+		return 0;
+	}
+	else if( received == SOCKET_ERROR )
+	{
+		m_error = WSAGetLastError();
+		return received;
+	}
+
+	return received;
+}
+
+int Socket::receive(ubyte * buffer, uint size, NetAddress * address)
+{
+	int addrSize = sizeof(NetAddress);
+	int received = ::recvfrom(m_socket, (char*)buffer, size, 0, (SOCKADDR*)address, &addrSize);
+
 	// connection closed
 	if( received == 0 )
 	{

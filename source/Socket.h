@@ -32,7 +32,9 @@ public:
 	uint port() const;
 	uint error() const;
 
+	int send(const ubyte * buffer, uint size, NetAddress * address);
 	int send(const ubyte * buffer, uint size);
+	int receive(ubyte * buffer, uint size, NetAddress * address);
 	int receive(ubyte * buffer, uint size);
 
 	Socket accept();

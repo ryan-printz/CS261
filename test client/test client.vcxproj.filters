@@ -6,10 +6,12 @@
     <ClInclude Include="..\source\IDecorator.h" />
     <ClInclude Include="..\source\Socket.h" />
     <ClInclude Include="..\source\TCPConnection.h" />
+    <ClInclude Include="..\source\UDPConnection.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\source\Socket.cpp" />
     <ClCompile Include="..\source\TCPConnection.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="..\source\UDPConnection.cpp" />
   </ItemGroup>
 </Project>
