@@ -80,6 +80,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="..\source\ConnectionManager.hpp" />
     <ClInclude Include="..\source\IConnection.h" />
     <ClInclude Include="..\source\IDecorator.h" />
     <ClInclude Include="..\source\Socket.h" />
@@ -88,6 +89,7 @@
     <ClInclude Include="..\source\UDPConnection.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\source\ConnectionManager.cpp" />
     <ClCompile Include="..\source\Socket.cpp" />
     <ClCompile Include="..\source\TCPConnection.cpp" />
     <ClCompile Include="..\source\UDPConnection.cpp" />

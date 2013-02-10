@@ -3,6 +3,8 @@ Microsoft Visual Studio Solution File, Format Version 11.00
 # Visual Studio 2010
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Source", "Source", "{DC369597-3BD9-46B1-9A32-F36C1EE1BA02}"
 	ProjectSection(SolutionItems) = preProject
+		source\ConnectionManager.cpp = source\ConnectionManager.cpp
+		source\ConnectionManager.hpp = source\ConnectionManager.hpp
 		source\DropConnectionDecorator.h = source\DropConnectionDecorator.h
 		source\IConnection.h = source\IConnection.h
 		source\IDecorator.h = source\IDecorator.h

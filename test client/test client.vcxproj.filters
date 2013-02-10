@@ -7,11 +7,13 @@
     <ClInclude Include="..\source\Socket.h" />
     <ClInclude Include="..\source\TCPConnection.h" />
     <ClInclude Include="..\source\UDPConnection.h" />
+    <ClInclude Include="..\source\ConnectionManager.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\source\Socket.cpp" />
     <ClCompile Include="..\source\TCPConnection.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="..\source\UDPConnection.cpp" />
+    <ClCompile Include="..\source\ConnectionManager.cpp" />
   </ItemGroup>
 </Project>
