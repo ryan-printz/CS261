@@ -14,8 +14,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Source", "Source", "{DC3695
 		source\TCPConnection.cpp = source\TCPConnection.cpp
 		source\TCPConnection.h = source\TCPConnection.h
 		source\Types.h = source\Types.h
-		source\UDPConnection.cpp = source\UDPConnection.cpp
-		source\UDPConnection.h = source\UDPConnection.h
 	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "client", "client\client.vcxproj", "{E341B12D-29DC-4223-98ED-96AA8A3A16B3}"

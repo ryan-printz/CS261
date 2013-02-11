@@ -6,14 +6,14 @@
     <ClInclude Include="..\source\IDecorator.h" />
     <ClInclude Include="..\source\Socket.h" />
     <ClInclude Include="..\source\TCPConnection.h" />
-    <ClInclude Include="..\source\UDPConnection.h" />
     <ClInclude Include="..\source\ConnectionManager.hpp" />
+    <ClInclude Include="..\source\ProtoConnection.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp" />
     <ClCompile Include="..\source\Socket.cpp" />
     <ClCompile Include="..\source\TCPConnection.cpp" />
-    <ClCompile Include="..\source\UDPConnection.cpp" />
     <ClCompile Include="..\source\ConnectionManager.cpp" />
+    <ClCompile Include="..\source\ProtoConnection.cpp" />
   </ItemGroup>
 </Project>

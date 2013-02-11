@@ -17,13 +17,13 @@
     <ClInclude Include="..\source\Socket.h" />
     <ClInclude Include="..\source\TCPConnection.h" />
     <ClInclude Include="..\source\Types.h" />
-    <ClInclude Include="..\source\UDPConnection.h" />
+    <ClInclude Include="..\source\ProtoConnection.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\source\ConnectionManager.cpp" />
     <ClCompile Include="..\source\Socket.cpp" />
     <ClCompile Include="..\source\TCPConnection.cpp" />
-    <ClCompile Include="..\source\UDPConnection.cpp" />
+    <ClCompile Include="..\source\ProtoConnection.cpp" />
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
