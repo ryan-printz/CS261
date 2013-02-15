@@ -5,15 +5,14 @@
 *
 *       2013/02/09   
 */
-
-#include "ConnectionManager.hpp"
-#include "IConnection.h"
 #include <cassert>
+#include "IConnection.h"
+#include "ConnectionManager.hpp"
 
 //******************************************************************************
-ConnectionManager::ConnectionManager () {
+//ConnectionManager::ConnectionManager () {
 
-}
+//}
 
 //******************************************************************************
 ConnectionManager::~ConnectionManager () {

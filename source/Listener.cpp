@@ -52,10 +52,12 @@ IConnection * Listener::Listen () {
     // this switch case, m_type, and a whole lot of shit here.
     switch (m_type) {
     case LISTEN_TCP:
-        bool success = reinterpret_cast<TCPConnection *>(m_connection)->connect(m_socket);
-        if (success) {
-            newConnection = m_connection;
-            m_connection = reinterpret_cast<IConnection*>(new TCPConnection);
+        {
+            bool success = reinterpret_cast<TCPConnection *>(m_connection)->connect(m_socket);
+            if (success) {
+                newConnection = m_connection;
+                m_connection = reinterpret_cast<IConnection*>(new TCPConnection);
+            }
         }
         break;
     case LISTEN_UDP:

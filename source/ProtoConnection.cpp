@@ -48,6 +48,8 @@ int ProtoConnection::makeAck(ubyte * buffer)
 
 	int * acks = (int*)(buffer + sizeof(header));
 	*acks = 0;
+
+    return 0;
 }
 
 // socket and the destination ip:port pair.
@@ -119,6 +121,7 @@ int ProtoConnection::update(float d)
 	{
 		m_socket->send(message->second.message, message->second.length, &m_connection);
 	}
+    return 0;
 }
 
 // receives a datagram.

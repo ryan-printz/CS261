@@ -1,3 +1,5 @@
+#pragma once
+
 #include "IConnection.h"
 #include "Socket.h"
 

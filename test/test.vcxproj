@@ -23,6 +23,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\source\ConnectionManager.cpp" />
+    <ClCompile Include="..\source\Engine.cpp" />
     <ClCompile Include="..\source\Listener.cpp" />
     <ClCompile Include="..\source\Socket.cpp" />
     <ClCompile Include="..\source\TCPConnection.cpp" />

@@ -15,7 +15,7 @@ class IConnection;
 
 class ConnectionManager {
 public:
-    ConnectionManager  ();
+    ConnectionManager  () {}
     ~ConnectionManager ();
     
     void Add    (IConnection * connection);

@@ -1,7 +1,7 @@
 #include "Socket.h"
 #include <iostream>
 
-#pragma comment(lib, "WS2_32.lib");
+#pragma comment(lib, "WS2_32.lib")
 
 bool initSockets(bool printInfo)
 {

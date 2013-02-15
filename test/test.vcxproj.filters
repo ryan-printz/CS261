@@ -28,6 +28,9 @@
     <ClCompile Include="..\source\Listener.cpp">
       <Filter>ConnectionManager</Filter>
     </ClCompile>
+    <ClCompile Include="..\source\Engine.cpp">
+      <Filter>Engine</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="ConnectionManager">
