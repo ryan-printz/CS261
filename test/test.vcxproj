@@ -12,6 +12,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\source\ConnectionManager.hpp" />
+    <ClInclude Include="..\source\Engine.h" />
     <ClInclude Include="..\source\IConnection.h" />
     <ClInclude Include="..\source\IDecorator.h" />
     <ClInclude Include="..\source\Listener.h" />

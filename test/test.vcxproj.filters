@@ -13,6 +13,9 @@
     <ClInclude Include="..\source\Listener.h">
       <Filter>ConnectionManager</Filter>
     </ClInclude>
+    <ClInclude Include="..\source\Engine.h">
+      <Filter>Engine</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp" />
@@ -29,6 +32,9 @@
   <ItemGroup>
     <Filter Include="ConnectionManager">
       <UniqueIdentifier>{d54ebefc-8a36-46b9-85b2-26a570f7710d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine">
+      <UniqueIdentifier>{7dc2aad2-9828-43c6-b54f-181911647f1e}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

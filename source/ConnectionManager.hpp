@@ -8,7 +8,7 @@
 
 #pragma once
 
-#include <vector>
+#include <list>
 #include <set>
 
 class IConnection;
@@ -18,9 +18,15 @@ public:
     ConnectionManager  ();
     ~ConnectionManager ();
     
+    void Add    (IConnection * connection);
+    void Remove (IConnection * connection);
+    
+
 
 private:
+    void ClearDeleteList ();
 
-
-    std::vector<IConnection *> m_udpConnections;
+private:
+    std::list<IConnection *> m_connections;
+    std::set<IConnection *> m_deleteList;
 };

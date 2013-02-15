@@ -8,6 +8,7 @@
 
 #include "ConnectionManager.hpp"
 #include "IConnection.h"
+#include <cassert>
 
 //******************************************************************************
 ConnectionManager::ConnectionManager () {
@@ -17,12 +18,31 @@ ConnectionManager::ConnectionManager () {
 //******************************************************************************
 ConnectionManager::~ConnectionManager () {
     ClearDeleteList();
+}
 
-    auto deleteItr = m_connections.begin();
-    
-    for (; deleteItr != m_connections.end(); ++deleteItr) {
-        delete &(deleteItr->first);
-        //deleteItr->second->close();
-        delete deleteItr->second;
+//******************************************************************************
+void ConnectionManager::Add (IConnection * connection) {
+    assert(connection != nullptr);
+
+    m_connections.push_back(connection);
+}
+
+//******************************************************************************
+void ConnectionManager::Remove (IConnection * connection) {
+    assert(connection != nullptr);
+
+    m_deleteList.insert(connection);
+}
+
+//******************************************************************************
+void ConnectionManager::ClearDeleteList () {
+    auto delItr = m_deleteList.begin();
+
+    for (; delItr != m_deleteList.end(); ++delItr) {
+        //(*delItr)->close();
+        delete *delItr;
+        m_connections.remove(*delItr);
     }
+
+    m_deleteList.clear();
 }
