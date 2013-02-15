@@ -10,7 +10,10 @@ int main(void)
 
     Engine Test;
 
-    Test.ConnectTcp("192.168.1.101", 4001);
+    HSession testSession = Test.ConnectTcp("192.168.1.101", 4001);
+
+    std::string testMessage("Message Fucking Received.");
+    Test.Send(testMessage, testSession);
 
     while (1) {
         Test.Update(0);

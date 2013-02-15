@@ -245,7 +245,8 @@ int Socket::receive(ubyte * buffer, uint size)
 	else if( received == SOCKET_ERROR )
 	{
 		m_error = WSAGetLastError();
-		return received;
+        if (m_error == WSAEWOULDBLOCK)
+            return 0; // for now I am using this for chat, after that fix this
 	}
 
 	return received;

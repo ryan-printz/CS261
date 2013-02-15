@@ -14,6 +14,15 @@ int main(void)
 
     while (1) {
         Test.Update(0);
+
+        unsigned char buffer[256];
+
+        int result = Test.Receive(buffer, 256);
+
+        if (result != 0) {
+            printf((const char *)buffer);
+            break;
+        }
     }
 
 	// cleanup.

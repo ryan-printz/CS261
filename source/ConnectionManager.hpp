@@ -24,6 +24,8 @@ public:
     void Remove (IConnection * connection);
     void Send   (unsigned char * buffer, unsigned bufferLen, HSession session);
 
+    int Receive (unsigned char * buffer, unsigned bufferLen);
+
     bool IsHandleValid (HSession session);
     
 

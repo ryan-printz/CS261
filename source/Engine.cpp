@@ -88,26 +88,22 @@ void Engine::Update (float dt) {
     }
 }
 
+//******************************************************************************
 // just a temp function for chat shit
-void PrepareChatMessage (const std::string & message, unsigned char ** buffer, unsigned & bufferLen) {
+void Engine::TempPrepareChatMessage (const std::string & message, unsigned char ** buffer, unsigned & bufferLen) {
     bufferLen = message.size() + 1;
     *buffer = new unsigned char[bufferLen];
     memcpy(*buffer, message.c_str(), message.size());
-    *buffer[message.size()] = '\0';
+    (*buffer)[bufferLen-1] = '\0';
 }
 
 //******************************************************************************
-template <typename T>
-void Engine::Send (T * message, HSession session) {
-    ubyte * buffer = nullptr;
-    unsigned bufferLen = 0;
-
-    // Joe, do something like this to translate message for sending
-    // replace this shit with your stuff in your own file
-    // shouldn't look for just std::string, our messages can be whatever you want
-    // this is just bad code for you to replace
-    PrepareChatMessage(*message, &buffer, &bufferlen);
-
+void Engine::Send (unsigned char * buffer, unsigned bufferLen, HSession session) {
     m_connectionManager->Send(buffer, bufferLen, session);
+} 
 
+//******************************************************************************
+// temp for chat
+int Engine::Receive (unsigned char * buffer, unsigned bufferLen ) {
+    return m_connectionManager->Receive (buffer, bufferLen);
 }
