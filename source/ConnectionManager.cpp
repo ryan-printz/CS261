@@ -45,3 +45,28 @@ void ConnectionManager::ClearDeleteList () {
 
     m_deleteList.clear();
 }
+
+//******************************************************************************
+bool ConnectionManager::IsHandleValid (HSession session) {
+    auto connectionItr = m_connections.begin();
+
+    IConnection * connection = (IConnection*)session;
+
+    for (; connectionItr != m_connections.end(); ++connectionItr) {
+        if (*connectionItr == connection)
+            return true;
+    }
+
+    return false;
+}
+
+//******************************************************************************
+void ConnectionManager::Send (unsigned char * buffer, unsigned bufferLen, HSession session) {
+    if (!IsHandleValid(session)) {
+        return;
+    }
+
+    IConnection * connection = (IConnection*)session;
+
+    connection->send(buffer, bufferLen);
+}

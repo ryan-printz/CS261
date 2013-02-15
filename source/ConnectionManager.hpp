@@ -11,6 +11,8 @@
 #include <list>
 #include <set>
 
+struct DevSession;
+typedef DevSession * HSession;
 class IConnection;
 
 class ConnectionManager {
@@ -20,6 +22,9 @@ public:
     
     void Add    (IConnection * connection);
     void Remove (IConnection * connection);
+    void Send   (unsigned char * buffer, unsigned bufferLen, HSession session);
+
+    bool IsHandleValid (HSession session);
     
 
 

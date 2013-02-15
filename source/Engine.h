@@ -12,7 +12,6 @@
 
 typedef struct DevSession {} * HSession;
 
-
 class ConnectionManager;
 class Listener;
 
@@ -26,6 +25,9 @@ public:
     // returns if the port is now listening
     bool ToggleListenTcp (unsigned port);
     void Update (float dt);
+
+    template <typename T>
+    void Send (T * message, HSession session);
 
 private:
     Engine (Engine&);
