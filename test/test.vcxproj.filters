@@ -6,14 +6,29 @@
     <ClInclude Include="..\source\IDecorator.h" />
     <ClInclude Include="..\source\Socket.h" />
     <ClInclude Include="..\source\TCPConnection.h" />
-    <ClInclude Include="..\source\ConnectionManager.hpp" />
     <ClInclude Include="..\source\ProtoConnection.h" />
+    <ClInclude Include="..\source\ConnectionManager.hpp">
+      <Filter>ConnectionManager</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\Listener.h">
+      <Filter>ConnectionManager</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp" />
     <ClCompile Include="..\source\Socket.cpp" />
     <ClCompile Include="..\source\TCPConnection.cpp" />
-    <ClCompile Include="..\source\ConnectionManager.cpp" />
     <ClCompile Include="..\source\ProtoConnection.cpp" />
+    <ClCompile Include="..\source\ConnectionManager.cpp">
+      <Filter>ConnectionManager</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\Listener.cpp">
+      <Filter>ConnectionManager</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="ConnectionManager">
+      <UniqueIdentifier>{d54ebefc-8a36-46b9-85b2-26a570f7710d}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
 </Project>
