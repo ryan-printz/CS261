@@ -24,6 +24,7 @@ public:
     ~Listener ();
 
     IConnection * Listen ();
+    ListenType Type () {return m_type;}
 
 private:
     void InitializeTcp (unsigned port);

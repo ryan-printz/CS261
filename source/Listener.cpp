@@ -85,6 +85,9 @@ void Listener::InitializeTcp (unsigned port) {
     }
 
     m_socket->initializeTCP(Socket::localIP(), port);
+    m_socket->bind();
+    m_socket->setBlocking(false);
+    m_socket->listen();
 }
 
 //******************************************************************************

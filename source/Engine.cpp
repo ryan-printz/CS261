@@ -51,3 +51,39 @@ const HSession Engine::ConnectTcp (char * remoteIp, unsigned remotePort) {
 
     return newHandle;
 }
+
+//******************************************************************************
+bool Engine::ToggleListenTcp (unsigned port) {
+    auto listItr = m_listenList.find(port);
+
+    if (listItr != m_listenList.end()) {
+        if (listItr->second->Type() == LISTEN_TCP) {
+            m_listenList.erase(listItr);
+            return false;
+        }
+    }
+
+    Listener * newListener = new Listener(LISTEN_TCP, port);
+
+    if (!newListener) {
+        return false;
+    }
+
+    m_listenList[port] = newListener;
+
+    return true;
+}
+
+//******************************************************************************
+void Engine::Update (float dt) {
+    auto listenItr = m_listenList.begin();
+
+    for (; listenItr != m_listenList.end(); ++listenItr) {
+        IConnection * newConnection = listenItr->second->Listen();
+
+        while (newConnection != nullptr) {
+            m_connectionManager->Add(newConnection);
+            newConnection = listenItr->second->Listen();
+        }
+    }
+}

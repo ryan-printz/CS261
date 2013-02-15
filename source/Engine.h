@@ -8,7 +8,7 @@
 
 #pragma once
 
-#include <list>
+#include <unordered_map>
 
 typedef struct DevSession {} * HSession;
 
@@ -16,20 +16,24 @@ typedef struct DevSession {} * HSession;
 class ConnectionManager;
 class Listener;
 
-
 class Engine {
 public:
     Engine ();
     ~Engine ();
 
+    const HSession ConnectTcp (char * remoteIp, unsigned remotePort);
+
+    // returns if the port is now listening
+    bool ToggleListenTcp (unsigned port);
+    void Update (float dt);
 
 private:
     Engine (Engine&);
     Engine& operator= (Engine&);
 
-    const HSession ConnectTcp (char * remoteIp, unsigned remotePort);
 private:
     ConnectionManager * m_connectionManager;
-    std::list<Listener *> m_listenList;
+    // stores port, listener
+    std::unordered_map<unsigned, Listener *> m_listenList;
 
 };
