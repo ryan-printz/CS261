@@ -17,6 +17,7 @@
     <ClInclude Include="..\source\IDecorator.h" />
     <ClInclude Include="..\source\InputThreading.h" />
     <ClInclude Include="..\source\Listener.h" />
+    <ClInclude Include="..\source\SequenceNumber.h" />
     <ClInclude Include="..\source\Socket.h" />
     <ClInclude Include="..\source\TCPConnection.h" />
     <ClInclude Include="..\source\Types.h" />

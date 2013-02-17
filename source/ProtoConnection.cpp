@@ -4,52 +4,73 @@ ProtoConnection::ProtoConnection()
 	: m_socket(nullptr), m_isClient(false), m_connected(false)
 {}
 
-int ProtoConnection::addProtoHeader(ubyte * message, uint size, uint priority, bool requestAck)
+// builds an ack pack.
+uint ProtoConnection::makeAck()
 {
-	msgHeader header;
-	header.flags = 0;
-
-	if(requestAck)
-		header.flags |= MSG_REQUESTACK;
-
-	switch( priority )
+	uint ack = 0;
+	for(auto it = m_receivedPackets.begin(); it != m_receivedPackets.end(); ++it)
 	{
-	case 0:
-		header.flags |= MSG_HIGH_PRIORITY;
-		break;
+		if( it->m_sequence == m_remote || it->m_sequence > m_remote )
+			break;
 
-	case 2:
-		header.flags |= MSG_LOW_PRIORITY;
-		break;
-	};
+		ubyte bitIndex = getBitIndex(it->m_sequence, m_remote);
+		if( bitIndex < 32 )
+			ack |= 1 << bitIndex;
+	}
 
-	header.length = size;
-
-	// shift the message right by the size of the header.
-	// the overflow is discarded.
-	for(int i = max(size + sizeof(msgHeader), s_maxSize) - 1; i >= sizeof(msgHeader); --i)
-		message[i] = message[i - sizeof(msgHeader)];
-
-	// attach the header.
-	memcpy(message, &header, sizeof(msgHeader));
-
-	return size + sizeof(msgHeader);
+	return ack;
 }
 
-int ProtoConnection::makeAck(ubyte * buffer)
+void ProtoConnection::useAck(SequenceNumber ack, uint ackPack)
 {
-	msgHeader header;
+	// there aren't any packets to ack.
+	if( m_unackedPackets.empty() )
+		return;
 
-	header.flags = MSG_ACK;
-	header.length = 1;
-	header.sequenceNumber = m_sequenceNumber;
+	auto packet = m_unackedPackets.begin();
+	while( packet != m_unackedPackets.end() )
+	{
+		bool packetAcked = false;
+		
+		if(packet->m_sequence == ack)
+			packetAcked = true;
+		else if( packet->m_sequence <= ack )
+		{
+			int bitIndex = getBitIndex(packet->m_sequence, ack);
+			if( bitIndex < 32 )
+				packetAcked = (ackPack >> bitIndex) & 1;
+		}
 
-	memcpy(buffer, &header, sizeof(header));
+		if( packetAcked )
+		{
+			// update stats.
+			++m_stats.m_ackedPackets;
+			updateRTT(packet->m_time);
 
-	int * acks = (int*)(buffer + sizeof(header));
-	*acks = 0;
+			// move the packet to the acked queue
+			// remove it from unacked.
+			// set it as acked this update.
+			m_ackedPackets.insert(*packet);
+			m_acks.push_back(packet->m_sequence);
+			packet = m_unackedPackets.erase( packet );
+		}
+		else
+			++packet;
+	}
+}
 
-    return 0;
+// updates the round trip time with a running average.
+void ProtoConnection::updateRTT(float time)
+{
+	m_stats.m_roundTripTime += (time - m_stats.m_roundTripTime) * 0.1f;
+}
+
+ubyte ProtoConnection::getBitIndex(const SequenceNumber & lhs, const SequenceNumber & rhs)
+{
+	if( lhs > rhs )
+		return rhs + (std::numeric_limits<uint>::max() - lhs);
+	else
+		return rhs - 1 - lhs;
 }
 
 // socket and the destination ip:port pair.
@@ -92,85 +113,152 @@ bool ProtoConnection::cleanUp()
 }
 
 // send a packet to the "connected" 
-// needs to have a header, or it will cause errors with the received 
-// packet.
+// TODO: priority & resend
+// TODO: flow control.
 int ProtoConnection::send(ubyte * buffer, uint len)
 {
-	msgHeader * header = (msgHeader*)buffer;
+	ubyte packet[256];
 
-	if(header->flags & MSG_REQUESTACK)
-	{
-		msgInfo info;
-		info.length = len;
+	ProtoHeader header;
+	header.m_sequence = m_local;
+	header.m_ack	  = m_remote;
+	header.m_acks	  = makeAck();
 
-		// copy the message to the sent buffer, then mark it as a resent packet.
-		memcpy(info.message, buffer, len);
-		reinterpret_cast<msgHeader*>(&info.message)->flags | MSG_RESEND;
+	memcpy( packet, &header, sizeof(ProtoHeader) );
+	memcpy( packet + sizeof(ProtoHeader), buffer, len );
 
-		m_resend.emplace(std::make_pair(m_sequenceNumber, info));
+	if( m_socket->send(packet, len, &m_connection) != len )
+		return 0;
 
-		header->sequenceNumber = m_sequenceNumber;
-	}
+	// store info about this packet for stats.
+	PacketInfo info;
+	info.m_sequence = m_local;
+	info.m_time		= 0.0f;
+	info.m_size		= len;
 
-	return m_socket->send(buffer, len, &m_connection);
-}
+	m_sentPackets.push_back(info);
+	m_unackedPackets.push_back(info);
 
-int ProtoConnection::update(float d)
-{
-	for (auto message = m_resend.begin(); message != m_resend.end(); ++message)
-	{
-		m_socket->send(message->second.message, message->second.length, &m_connection);
-	}
-    return 0;
+	++m_local;
+	++m_stats.m_sentPackets;
+
+	return len;
 }
 
 // receives a datagram.
-// there is no logic for the connection, 
-// receives all data sent to the port, regardless of 
-// the sender.
 int ProtoConnection::receive(ubyte * buffer, uint len)
 {
-	int result = m_socket->receive(buffer, len, nullptr);
+	ubyte packet[256];
 
-	msgHeader * header = (msgHeader*)buffer;
+	if( len <= sizeof(ProtoHeader) )
+		return 0;
 
-	ubyte responseBuffer[256];
-	uint responseSize = 0;
-	if(header->flags & MSG_RESEND)
+	NetAddress from;
+	int received = m_socket->receive(packet, 256, &from);
+
+	// no packet was received
+	// or the packet was not from this protocol.
+	if( received == 0 || !reinterpret_cast<ProtoHeader*>(packet)->valid() )
+		return 0;
+
+	// pull out the header.
+	// adjust the received size appropriately.
+	ProtoHeader * header = reinterpret_cast<ProtoHeader*>(packet);
+	received -= sizeof(ProtoHeader);
+
+	++m_stats.m_receivedPackets;
+	// drop duplicate packets.
+	// TODO: unless it's a resend?
+	if( m_receivedPackets.has( header->m_sequence ) )
+		return 0;
+
+	PacketInfo info;
+	info.m_sequence	= header->m_sequence;
+	info.m_time		= 0.0f;
+	info.m_size		= received;
+
+	// store the packet to generate acks later.
+	m_receivedPackets.push_back( info );
+
+	// update the remote sequence number.
+	if( header->m_sequence > m_remote )
+		m_remote = header->m_sequence;
+
+	// check out what the packet ack'd
+	useAck(header->m_ack, header->m_acks);
+
+	memcpy(buffer, packet + sizeof(ProtoHeader), received);
+
+	return received;
+}
+
+// TODO: keep alive
+void ProtoConnection::update(float dt)
+{
+	// get a little bit closer to timing out.
+	m_idleTimer += dt;
+
+	if( m_keepAliveInterval && !((int)m_idleTimer % m_keepAliveInterval) )
+	{}
+
+	if( m_idleTimer > m_timeout )
 	{
-		// check if this is actually a duplicate resend.
-		// if it is, ack it, then break.
-		// otherwise, mark it as recieved, then fall through.
-
-		auto packet = m_missedPackets.begin();
-		for(; packet != m_missedPackets.end() && *packet != header->sequenceNumber; ++packet);
-
-		if(packet == m_missedPackets.end())
-		{
-			responseSize = makeAck(responseBuffer);
-			m_socket->send(responseBuffer, responseSize, &m_connection);
-
-			return result;
-		}
-
-		m_missedPackets.erase(packet);
+		m_connected = false;
 	}
 
-	if(header->flags & MSG_REQUESTACK)
-	{
-		// update the sequence number
-		// mark any missing packets in between.
-		// if the packet is sufficiently high priority.
-		if(!(header->flags & MSG_LOW_PRIORITY))
-			for(int i = m_sequenceNumber; i < header->sequenceNumber; ++i)
-				m_missedPackets.push_back(i);
+	// advance all the times in the packet queues.
+	m_sentPackets.advance(dt);
+	m_ackedPackets.advance(dt);
+	m_unackedPackets.advance(dt);
+	m_receivedPackets.advance(dt);
 
-		m_sequenceNumber = header->sequenceNumber;
-		
-		// send an ack.
-		responseSize = makeAck(responseBuffer);
-		m_socket->send(responseBuffer, responseSize, &m_connection);
+	// update each set of packets.
+	// remove all the sent packets that have been around for longer than timeout.
+	while( !m_sentPackets.empty() && m_sentPackets.front().m_time > m_timeout )
+		m_sentPackets.pop_front();
+
+	// remove all the sent packets that have been around for longer than 2 * timeout
+	// used to determine round trip time.
+	while( !m_ackedPackets.empty() && m_sentPackets.front().m_time > 2 * m_timeout )
+		m_ackedPackets.pop_front();
+
+	// if a packet takes more than timeout time to be acked, it has been dropped.
+	// TODO: If a high priority packet was dropped, queue it to be resent.
+	while( !m_unackedPackets.empty() && m_unackedPackets.front().m_time > m_timeout )
+	{
+		m_unackedPackets.pop_front();
+		++m_stats.m_lostPackets;
 	}
+
+	if( !m_receivedPackets.empty() )
+	{
+		// maintain the last 33 packets received (by sequence number)
+		const SequenceNumber latest = m_receivedPackets.back().m_sequence;
+		const SequenceNumber oldest = (uint)latest >= 34 ? (latest - 34) : std::numeric_limits<uint>::max() - (34 - latest);
+
+		// remove the received packets that have lower sequence numbers than the latest 33 packets.
+		while( !m_receivedPackets.empty() && m_receivedPackets.front().m_sequence <= oldest )
+			m_receivedPackets.pop_front();
+	}
+}
+
+void ProtoConnection::updateStats()
+{
+	int upBPS = 0;
+	for(auto upPacket = m_sentPackets.begin(); upPacket != m_sentPackets.end(); ++upPacket)
+		upBPS += upPacket->m_size;
+
+	int downBPS = 0;
+	for(auto downPacket = m_receivedPackets.begin(); downPacket != m_receivedPackets.end(); ++downPacket)
+		downBPS += downPacket->m_size;
+
+	// bytes per second
+	upBPS /= m_timeout;
+	downBPS /= m_timeout;
+
+	// bits per millisecond.
+	m_stats.m_upBandwidth = upBPS * 8 / 1000.0f;
+	m_stats.m_downBandwith = downBPS * 8 / 1000.0f;
 }
 
 std::string ProtoConnection::connectionInfo() const

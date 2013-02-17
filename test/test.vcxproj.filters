@@ -17,6 +17,7 @@
       <Filter>Engine</Filter>
     </ClInclude>
     <ClInclude Include="..\source\InputThreading.h" />
+    <ClInclude Include="..\source\SequenceNumber.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp" />
