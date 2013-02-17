@@ -7,6 +7,9 @@
 */
 
 #include <Windows.h>
+#include <string>
+#include <cassert>
+#include <iostream>
 
 static std::string      s_messageStream;
 static CRITICAL_SECTION s_critSect;
@@ -35,16 +38,16 @@ DWORD WINAPI ThreadInputFunction( LPVOID param ) {
                 bool written = false;
 
                 while ( !written ) {
-                    EnterCriticalSection( s_critSect );
-                    if ( s_messageStream != 0 ) {
-                        LeaveCriticalSection( s_critSect );
+                    EnterCriticalSection( &s_critSect );
+                    if ( s_messageStream.size() != 0 ) {
+                        LeaveCriticalSection( &s_critSect );
                         Sleep(1);
                         continue;
                     }
 
                     s_messageStream = buffer;
                     written = true;
-                    LeaveCriticalSection(s_critSect);
+                    LeaveCriticalSection(&s_critSect);
                 }
                 break;
             }
@@ -54,32 +57,15 @@ DWORD WINAPI ThreadInputFunction( LPVOID param ) {
     }
 }
 
-bool CheckInput       (std::string & buffer) {
-    if (!s_isActive) {
-        StartInputThread ();
-    }
-
-    bool success = false;
-
-    EnterCriticalSection(s_critSect);
-
-    if (s_messageStream != 0) {
-        buffer = s_messageStream;
-        s_messageStream.clear();
-        success = true;
-    }
-
-    return success;
-}
-
 bool StartInputThread () {
     if (s_isActive)
         return true;
 
     s_termEvent = CreateEvent(NULL, true, false, NULL);
-    InitializeCriticalSection(s_critSect);
+    InitializeCriticalSection(&s_critSect);
     s_threadHandle = CreateThread(
         NULL,
+        0,
         ThreadInputFunction,
         NULL,
         0,
@@ -87,15 +73,38 @@ bool StartInputThread () {
     );
 
     s_isActive = true;
+
+    return true;
 }
 
 bool StopInputThread  () {
     if (!s_isActive)
         return true;
 
-    SetEvent( m_TerminationEvent );
-    CloseHandle( m_ThreadHandle );
-    DeleteCriticalSection( &m_CriticalSection );
+    SetEvent( s_termEvent );
+    CloseHandle( s_threadHandle );
+    DeleteCriticalSection( &s_critSect );
 
     s_isActive = false;
+
+    return true;
+}
+
+bool CheckInput       (std::string & buffer) {
+    if (!s_isActive) {
+        StartInputThread ();
+    }
+
+    bool success = false;
+
+    EnterCriticalSection(&s_critSect);
+
+    if (s_messageStream.size() != 0) {
+        buffer = s_messageStream;
+        s_messageStream.clear();
+        success = true;
+    }
+    LeaveCriticalSection(&s_critSect);
+
+    return success;
 }
