@@ -16,6 +16,7 @@
     <ClInclude Include="..\source\Engine.h">
       <Filter>Engine</Filter>
     </ClInclude>
+    <ClInclude Include="..\source\InputThreading.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp" />
@@ -31,6 +32,7 @@
     <ClCompile Include="..\source\Engine.cpp">
       <Filter>Engine</Filter>
     </ClCompile>
+    <ClCompile Include="..\source\InputThreading.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="ConnectionManager">
