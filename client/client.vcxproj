@@ -90,6 +90,7 @@
     <ClInclude Include="..\source\TCPConnection.h" />
     <ClInclude Include="..\source\Timer.h" />
     <ClInclude Include="..\source\Types.h" />
+    <ClInclude Include="..\source\Utils.hpp" />
     <ClInclude Include="FileShareClient.h" />
   </ItemGroup>
   <ItemGroup>
@@ -107,6 +108,7 @@
     <ClCompile Include="..\source\Socket.cpp" />
     <ClCompile Include="..\source\TCPConnection.cpp" />
     <ClCompile Include="..\source\Timer.cpp" />
+    <ClCompile Include="..\source\Utils.cpp" />
     <ClCompile Include="FileShareClient.cpp" />
     <ClCompile Include="main.cpp" />
   </ItemGroup>
