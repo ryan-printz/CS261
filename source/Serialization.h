@@ -40,4 +40,6 @@ public:
 	static types def[];
 };
 
+//Need to templatize this somehow
 void pack(BaseEvent E, char* buf);
+void unpack(BaseEvent E, char* buf);

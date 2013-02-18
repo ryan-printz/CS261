@@ -43,12 +43,40 @@ void pack(BaseEvent E, char* buf)
 			buf += m_sizeArray[TYPE_UARRAYSIZE];
 			current += m_sizeArray[TYPE_UARRAYSIZE];
 			++i;
-			memcpy(buf, (char*)(*current), m_sizeArray[E.def[i]] * temp);
+			memcpy(buf, *(char**)(current), m_sizeArray[E.def[i]] * temp);
 			current += 4;
 			buf += m_sizeArray[E.def[i]] * temp;
 			break;
 		default:
 			memcpy(buf, current, m_sizeArray[E.def[i]]);
+			buf += m_sizeArray[E.def[i]];
+			current += m_sizeArray[E.def[i]];
+			break;
+		}
+	}
+}
+
+void unpack(BaseEvent E, char* buf)
+{
+		char* current = (char*)(&E);
+	
+	for(int i = 0; E.def[i] != TYPE_END; ++i)
+	{
+		switch (E.def[i])
+		{
+		case TYPE_UARRAYSIZE:
+			unsigned temp;
+			memcpy(&temp, current, m_sizeArray[TYPE_UARRAYSIZE]);
+			memcpy(buf, current, m_sizeArray[TYPE_UARRAYSIZE]);
+			buf += m_sizeArray[TYPE_UARRAYSIZE];
+			current += m_sizeArray[TYPE_UARRAYSIZE];
+			++i;
+			memcpy(buf, (char*)(*current), m_sizeArray[E.def[i]] * temp);
+			current += 4;
+			buf += m_sizeArray[E.def[i]] * temp;
+			break;
+		default:
+			memcpy(current, buf, m_sizeArray[E.def[i]]);
 			buf += m_sizeArray[E.def[i]];
 			current += m_sizeArray[E.def[i]];
 			break;
