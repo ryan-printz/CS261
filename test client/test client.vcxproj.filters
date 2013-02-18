@@ -10,6 +10,7 @@
     <ClInclude Include="..\source\Engine.h" />
     <ClInclude Include="..\source\Listener.h" />
     <ClInclude Include="..\source\ProtoConnection.h" />
+    <ClInclude Include="..\source\SequenceNumber.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\source\Socket.cpp" />
@@ -20,5 +21,7 @@
     <ClCompile Include="..\source\Listener.cpp" />
     <ClCompile Include="..\source\ProtoConnection.cpp" />
     <ClCompile Include="..\source\InputThreading.cpp" />
+    <ClCompile Include="..\source\SequenceNumber.cpp" />
+    <ClCompile Include="..\source\IConnection.cpp" />
   </ItemGroup>
 </Project>
