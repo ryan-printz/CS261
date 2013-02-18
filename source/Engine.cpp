@@ -11,9 +11,17 @@
 #include "Listener.h"
 #include "ConnectionManager.hpp"
 #include "TCPConnection.h"
+#include "Socket.h"
 
 //******************************************************************************
-Engine::Engine () : f_newSession(nullptr) {
+Engine::Engine (
+    FSessionCallback sessionAccepted, 
+    FSessionCallback sessionClosed,
+    FEventReceivedCallback receiveEvent
+    ) 
+        : f_newSession(sessionAccepted)
+        , f_closeSession(sessionClosed)
+        , f_receiveEvent(receiveEvent) {
     m_connectionManager = new ConnectionManager;
 }
 
@@ -31,8 +39,17 @@ Engine::~Engine () {
     }
 }
 
+std::string Engine::GetSessionInfo (HSession session) const {
+    return m_connectionManager->GetSessionInfo(session);
+}
+
 //******************************************************************************
-const HSession Engine::ConnectTcp (char * remoteIp, unsigned remotePort) {
+bool Engine::Initialize () {
+    return initSockets(true);
+}
+
+//******************************************************************************
+HSession Engine::ConnectTcp (char * remoteIp, unsigned remotePort) {
     assert(remoteIp != nullptr);
 
     // I shouldn't have to know anything about this at engine level
@@ -119,9 +136,4 @@ void Engine::Send (unsigned char * buffer, unsigned bufferLen, HSession session)
 // temp for chat
 int Engine::Receive (unsigned char * buffer, unsigned bufferLen ) {
     return m_connectionManager->Receive (buffer, bufferLen);
-}
-
-//******************************************************************************
-void Engine::RegisterCallbacks (FSessionAcceptedCallback cb) {
-    f_newSession = cb;
 }

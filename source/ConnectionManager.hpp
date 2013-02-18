@@ -27,9 +27,9 @@ public:
 
     int Receive (unsigned char * buffer, unsigned bufferLen);
 
-    bool IsHandleValid (HSession session);
+    bool IsHandleValid (HSession session) const;
     
-
+    std::string GetSessionInfo (HSession session) const;
 
 private:
     void ClearDeleteList ();

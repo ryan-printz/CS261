@@ -17,16 +17,22 @@ class Listener;
 
 class Engine {
 public:
-    Engine ();
+    // Callback Types
+    typedef void (*FSessionCallback) (HSession);
+    typedef void (*FEventReceivedCallback) (HSession session, char * data);
+
+    Engine (
+        FSessionCallback sessionAccepted, 
+        FSessionCallback sessionClosed,
+        FEventReceivedCallback receiveEvent
+    );
     ~Engine ();
+    
+    std::string GetSessionInfo (HSession session) const;
 
-    void Initialize ();
-
-    const HSession ConnectTcp (char * remoteIp, unsigned remotePort);
-
-    // returns if the port is now listening
+    bool Initialize ();
+    HSession ConnectTcp (char * remoteIp, unsigned remotePort);
     bool ToggleListenTcp (unsigned port);
-
     void Update (float dt);
 
     template <typename T>
@@ -34,11 +40,6 @@ public:
 
     // This is a temp function until we get some joe up in hurrrrrr.
     int Receive (unsigned char * buffer, unsigned bufferLen);
-
-    //Callbacks
-    typedef void (*FSessionAcceptedCallback) (HSession);
-    typedef void (*FReceiveEventCallback) (HSession);
-    void RegisterCallbacks (FSessionAcceptedCallback callback);
 
 private:
     // this is a temp message to pack a string
@@ -54,7 +55,9 @@ private:
     std::unordered_map<unsigned, Listener *> m_listenList;
 
     //Callbacks
-    FSessionAcceptedCallback f_newSession;
+    FSessionCallback       f_newSession;
+    FSessionCallback       f_closeSession;
+    FEventReceivedCallback f_receiveEvent;
 };
 
 template <typename T>

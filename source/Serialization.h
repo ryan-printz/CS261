@@ -11,43 +11,14 @@ enum types
 	TYPE_END
 };
 
-template <class T>
-void fuckingShit (T & s) {
-	T.def[i];
-}
-
-class BaseEvent
-{
-public:
-	static types def[];
-};
-
-
-
-class TestEvent1 : public BaseEvent
-{
-public:
-	int test1;
-	float test2;
-	static types def[];
-};
-
-
-class TestEvent2 : public BaseEvent
-{
-public:
-	unsigned test1;
-	int* test2;
-
-	static types def[];
-};
-
 class Packer
 {
 public:
 	template <typename T>
-	void pack(T &E, char* buf)
+	void pack(T &E, char ** buf, unsigned & bufferLen)
 	{
+        CreatePackBuffer(E, buf, bufferLen);
+
 		char* current = (char*)(&E);
 	
 		for(int i = 0; E.def[i] != TYPE_END; ++i)
@@ -75,7 +46,7 @@ public:
 	}
 
 	template <typename T>
-	void unpack(T &E, char* buf)
+	void unpack(T &E, char * buf)
 	{
 		char* current = (char*)(&E);
 	
@@ -110,8 +81,33 @@ public:
 		}
 	}
 private:
+    template <typename T>
+    void CreatePackBuffer (T &E, unsigned char ** buffer, unsigned & bufferLen) 
+    {
+        for(int i = 0; E.def[i] != TYPE_END; ++i)
+        {
+            switch (E.def[i])
+            {
+            case TYPE_UARRAYSIZE:
+                {
+                    unsigned temp;
+                    memcpy(&temp, buf, m_sizeArray[TYPE_UARRAYSIZE]);
+                    bufferLen += m_sizeArray[TYPE_UARRAYSIZE] + sizeof(void*);
+                    ++i;
+                    break;
+                }
+            default:
+                bufferLen += m_sizeArray[E.def[i]];
+                break;
+            }
+        }
+        unsigned paddingBytes = sizeof(void*) - (bufferLen % sizeof(void*));
+        bufferLen += paddingBytes;
+        
+        *buffer = new unsigned char[bufferLen];
+    }
 	static int m_sizeArray[];
 };
 //Need to templatize this somehow
-void pack(BaseEvent E, char* buf);
-void unpack(BaseEvent E, char* buf);
+//void pack(BaseEvent E, char* buf);
+//void unpack(BaseEvent E, char* buf);

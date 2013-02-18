@@ -77,6 +77,38 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\source\ConnectionManager.cpp" />
+    <ClCompile Include="..\source\Engine.cpp" />
+    <ClCompile Include="..\source\FileShareEvents.cpp" />
+    <ClCompile Include="..\source\IConnection.cpp" />
+    <ClCompile Include="..\source\InputThreading.cpp" />
+    <ClCompile Include="..\source\Listener.cpp" />
+    <ClCompile Include="..\source\ProtoConnection.cpp" />
+    <ClCompile Include="..\source\SequenceNumber.cpp" />
+    <ClCompile Include="..\source\Serialization.cpp" />
+    <ClCompile Include="..\source\Socket.cpp" />
+    <ClCompile Include="..\source\TCPConnection.cpp" />
+    <ClCompile Include="..\source\Timer.cpp" />
+    <ClCompile Include="FileShareServer.cpp" />
+    <ClCompile Include="main.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\source\ConnectionManager.hpp" />
+    <ClInclude Include="..\source\DropConnectionDecorator.h" />
+    <ClInclude Include="..\source\Engine.h" />
+    <ClInclude Include="..\source\IConnection.h" />
+    <ClInclude Include="..\source\IDecorator.h" />
+    <ClInclude Include="..\source\InputThreading.h" />
+    <ClInclude Include="..\source\LatencyConnectionDecorator.h" />
+    <ClInclude Include="..\source\Listener.h" />
+    <ClInclude Include="..\source\ProtoConnection.h" />
+    <ClInclude Include="..\source\SequenceNumber.h" />
+    <ClInclude Include="..\source\Serialization.h" />
+    <ClInclude Include="..\source\Socket.h" />
+    <ClInclude Include="..\source\TCPConnection.h" />
+    <ClInclude Include="..\source\Timer.h" />
+    <ClInclude Include="..\source\Types.h" />
+    <ClInclude Include="FileShareServer.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -20,6 +20,17 @@ ConnectionManager::~ConnectionManager () {
 }
 
 //******************************************************************************
+std::string ConnectionManager::GetSessionInfo (HSession session) const {
+    if (!IsHandleValid(session)) {
+        return std::string("Invalid Session");
+    }
+
+    IConnection * connection = (IConnection*)session;
+
+    return connection->connectionInfo();
+}
+
+//******************************************************************************
 void ConnectionManager::Add (IConnection * connection) {
     assert(connection != nullptr);
 
@@ -47,7 +58,7 @@ void ConnectionManager::ClearDeleteList () {
 }
 
 //******************************************************************************
-bool ConnectionManager::IsHandleValid (HSession session) {
+bool ConnectionManager::IsHandleValid (HSession session) const {
     auto connectionItr = m_connections.begin();
 
     IConnection * connection = (IConnection*)session;
