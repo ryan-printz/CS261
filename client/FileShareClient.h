@@ -9,6 +9,7 @@
 #pragma once
 
 #include <string>
+#include <unordered_map>
 #include "../source/Engine.h"
 #include "../source/Timer.h"
 
@@ -39,6 +40,8 @@ private:
 
     // Session management
     HSession m_tcpServer;
+
+    std::unordered_map<fileInfo, HSession> m_transferSessions;
 
     std::string m_storePath;
     std::string m_sharePath;

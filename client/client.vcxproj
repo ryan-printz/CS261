@@ -76,8 +76,10 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="..\source\Chunk.h" />
     <ClInclude Include="..\source\ConnectionManager.hpp" />
     <ClInclude Include="..\source\Engine.h" />
+    <ClInclude Include="..\source\FileFrame.h" />
     <ClInclude Include="..\source\IConnection.h" />
     <ClInclude Include="..\source\IDecorator.h" />
     <ClInclude Include="..\source\Listener.h" />
@@ -91,8 +93,10 @@
     <ClInclude Include="FileShareClient.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\source\Chunk.cpp" />
     <ClCompile Include="..\source\ConnectionManager.cpp" />
     <ClCompile Include="..\source\Engine.cpp" />
+    <ClCompile Include="..\source\FileFrame.cpp" />
     <ClCompile Include="..\source\FileShareEvents.cpp" />
     <ClCompile Include="..\source\IConnection.cpp" />
     <ClCompile Include="..\source\InputThreading.cpp" />
