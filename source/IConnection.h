@@ -19,7 +19,7 @@ public:
 
 	// send/receive
 	virtual int receive(ubyte * buffer, uint len) = 0;
-	virtual int send(ubyte * buffer, uint len) = 0;
+	virtual int send(ubyte * buffer, uint len, ubyte flags = 0) = 0;
 
 	// update connection
 	virtual void update(float dt) = 0;

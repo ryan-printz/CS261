@@ -46,7 +46,7 @@ int TCPConnection::receive(ubyte * buffer, uint bufferlen)
 	return m_connection.receive(buffer, bufferlen);
 }
 
-int TCPConnection::send(ubyte * buffer, uint bufferlen)
+int TCPConnection::send(ubyte * buffer, uint bufferlen, ubyte)
 {
 	if( m_connection.invalid() ) 
 		return -1;

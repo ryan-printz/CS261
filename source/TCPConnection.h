@@ -15,7 +15,7 @@ public:
 
 	virtual bool connected() const;
 
-	virtual int send(ubyte * buffer, uint bufferlen);
+	virtual int send(ubyte * buffer, uint bufferlen, ubyte flags = 0);
 	virtual int receive(ubyte * buffer, uint bufferlen);
 
 	virtual void update(float dt);

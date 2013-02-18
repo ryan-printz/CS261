@@ -8,7 +8,7 @@ const static uint KEEP_ALIVE_MESSAGE = 0x1d5e03e7;
 const static uint DISCONNECT_MESSAGE = 0xf70f8c3b;
 
 ProtoConnection::ProtoConnection()
-	: m_socket(nullptr), m_connected(false), m_local(1)
+	: m_socket(nullptr), m_connected(false), m_useFlowControl(true), m_local(1)
 {
 	m_stats.m_ackedPackets = m_stats.m_lostPackets 
 						   = m_stats.m_receivedPackets 
@@ -20,6 +20,11 @@ ProtoConnection::ProtoConnection()
 	m_timeout = 0;
 
 	m_idleTimer = 0.0f;
+	m_modeTimer = 0.0f;
+	m_unpenaltyTimer = 0.0f;
+
+	m_penaltyTimer = 4.0f;
+	m_sendRate = 0.01f;
 }
 
 // socket and the destination ip:port pair.
@@ -78,10 +83,24 @@ bool ProtoConnection::cleanup()
 	return true;
 }
 
+int ProtoConnection::send(ubyte * buffer, uint len, ubyte flags)
+{
+	if( !m_useFlowControl )
+		return noFlowSend(buffer, len, flags);
+
+	FlowPacket fp;
+	memcpy( fp.m_buffer, buffer, len );
+
+	fp.m_size = len;
+	fp.m_flags = flags;
+
+	m_flowControl.insert(fp);
+
+	return len;
+}
+
 // send a packet to the "connected" 
-// TODO: priority & resend
-// TODO: flow control.
-int ProtoConnection::send(ubyte * buffer, uint len)
+int ProtoConnection::noFlowSend(ubyte * buffer, uint len, ubyte flags)
 {
 	ubyte packet[256];
 
@@ -89,12 +108,26 @@ int ProtoConnection::send(ubyte * buffer, uint len)
 	header.m_sequence = m_local;
 	header.m_ack	  = m_remote;
 	header.m_acks	  = makeAck();
+	header.m_flags	  = flags;
 
 	memcpy( packet, &header, sizeof(ProtoHeader) );
 	memcpy( packet + sizeof(ProtoHeader), buffer, len );
 
 	if( m_socket->send(packet, len + sizeof(ProtoHeader), &m_connection) != len + sizeof(ProtoHeader) )
 		return 0;
+
+	if( flags & ProtoHeader::PROTO_HIGH )
+	{
+		ResendPacket repack;
+
+		memcpy( repack.m_packet, &header.m_sequence, sizeof(SequenceNumber) );
+		memcpy( repack.m_packet + sizeof(SequenceNumber), buffer, len );
+
+		repack.m_size = len + sizeof(SequenceNumber);
+		repack.m_sequence = header.m_sequence;
+
+		m_resend.insert( repack );
+	}
 
 	// store info about this packet for stats.
 	PacketInfo info;
@@ -115,32 +148,46 @@ int ProtoConnection::send(ubyte * buffer, uint len)
 int ProtoConnection::receive(ubyte * buffer, uint len)
 {
 	ubyte packet[256];
+	uint headerSize = sizeof(ProtoHeader);
 
 	NetAddress from;
 	int received = m_socket->receive(packet, 256, &from);
 
 	// no packet was received
 	// or the packet was not from this protocol.
-	if( received == 0 || !reinterpret_cast<ProtoHeader*>(packet)->valid() )
+	if( received == -1 || !reinterpret_cast<ProtoHeader*>(packet)->valid() )
+		return -1;
+
+	// lost connection.
+	else if( received == 0 )
+	{
+		m_connected = false;
 		return 0;
+	}
 
 	// pull out the header.
 	// adjust the received size appropriately.
 	ProtoHeader * header = reinterpret_cast<ProtoHeader*>(packet);
-	received -= sizeof(ProtoHeader);
+	received -= headerSize;
 
 	m_idleTimer = 0.0f;
 	++m_stats.m_receivedPackets;
 
 	// drop duplicate packets.
 	if( m_receivedPackets.has( header->m_sequence ) )
-		return 0;
+		return -1;
 
 	if( header->m_flags & ProtoHeader::PROTO_RESENT )
 	{
-		ProtoHeader * originalHeader = reinterpret_cast<ProtoHeader*>(packet + sizeof(ProtoHeader));
-		// use a pointer to this thing
-		//packet += sizeof(ProtoHeader);
+		SequenceNumber * old = reinterpret_cast<SequenceNumber*>(packet + headerSize);
+		received -= sizeof(SequenceNumber);
+
+		PacketInfo resentInfo;
+		resentInfo.m_sequence = *old;
+		resentInfo.m_time	  = 0.0f;
+		resentInfo.m_size	  = sizeof(SequenceNumber);
+
+		m_receivedPackets.insert(resentInfo);
 	}
 
 	PacketInfo info;
@@ -156,24 +203,83 @@ int ProtoConnection::receive(ubyte * buffer, uint len)
 		m_remote = header->m_sequence;
 
 	// check out what the packet ack'd
-	useAck(header->m_ack, header->m_acks);
+	useAck(header->m_ack, header->m_acks, header->m_flags & ProtoHeader::PROTO_RESENT);
 
 	// don't return keep alive packets.
 	// handle disconnect messages.
 	if( received == sizeof(uint) )
-		if( *(uint*)(packet + sizeof(ProtoHeader)) == KEEP_ALIVE_MESSAGE )
+		if( *(uint*)(packet + headerSize) == KEEP_ALIVE_MESSAGE )
 		{
-			return 0;
+			return -1;
 		}
-		else if( *(uint*)(packet + sizeof(ProtoHeader)) == DISCONNECT_MESSAGE );
+		else if( *(uint*)(packet + headerSize) == DISCONNECT_MESSAGE )
 		{
 			m_connected = false;
 			return 0;
 		}
 
-	memcpy(buffer, packet + sizeof(ProtoHeader), received);
+	memcpy(buffer, packet + headerSize, received);
 
 	return received;
+}
+
+void ProtoConnection::updateFlowControl(float dt)
+{
+	m_flowTimer += dt;
+
+	// if send rate > 10fps
+	if( m_sendRate < 0.01f )
+	{
+		if( m_stats.m_roundTripTime > m_goodRoundTripTime )
+		{
+			// degrade the connection.
+			if( (m_sendRate *= 2.0f) > 0.01f )
+				m_sendRate = 0.01f;
+
+			if( m_modeTimer > 10.0f && m_penaltyTimer < 60.0f )
+				if( (m_penaltyTimer *= 2.0f) > 60.0f )
+					m_penaltyTimer = 60.0f;
+
+			m_modeTimer = 0.0f;
+			m_unpenaltyTimer = 0.0f;
+		}
+		else
+		{
+			m_modeTimer += dt;
+			if( (m_unpenaltyTimer += dt) > 10.0f && m_penaltyTimer > 1.0f )
+			{
+				if( (m_penaltyTimer *= 0.5f) < 1.0f )
+					m_penaltyTimer = 1.0f;
+				m_unpenaltyTimer = 0.0f;
+			}
+		}
+	}
+		
+	// if send rate < 30fps
+	if( m_sendRate > 0.0032f )
+	{
+		if( m_stats.m_roundTripTime <= m_goodRoundTripTime )
+			m_modeTimer += dt;
+		else
+			m_modeTimer = 0.0f;
+
+		if( m_modeTimer > m_penaltyTimer )
+		{
+			m_modeTimer = 0.0f;
+			m_penaltyTimer = 0.0f;
+
+			if( (m_sendRate *= 0.5f) < 0.0032f )
+				m_sendRate = 0.0032f;
+		}
+	}
+
+	while( m_flowTimer > 1.0f / m_sendRate && !m_flowControl.empty() )
+	{
+		noFlowSend(m_flowControl.back().m_buffer, m_flowControl.back().m_size, m_flowControl.back().m_flags);
+		m_flowControl.pop_back();
+
+		m_flowTimer -= 1.0f/m_sendRate;
+	}
 }
 
 void ProtoConnection::update(float dt)
@@ -192,10 +298,14 @@ void ProtoConnection::update(float dt)
 	}
 
 	// advance all the times in the packet queues.
+	m_resend.advance(dt);
 	m_sentPackets.advance(dt);
 	m_ackedPackets.advance(dt);
 	m_unackedPackets.advance(dt);
 	m_receivedPackets.advance(dt);
+
+	if( m_useFlowControl )
+		updateFlowControl(dt);
 
 	// update each set of packets.
 	// remove all the sent packets that have been around for longer than timeout.
@@ -208,7 +318,6 @@ void ProtoConnection::update(float dt)
 		m_ackedPackets.pop_front();
 
 	// if a packet takes more than timeout time to be acked, it has been dropped.
-	// TODO: If a high priority packet was dropped, queue it to be resent.
 	while( !m_unackedPackets.empty() && m_unackedPackets.front().m_time > m_timeout )
 	{
 		m_unackedPackets.pop_front();
@@ -225,6 +334,14 @@ void ProtoConnection::update(float dt)
 		while( !m_receivedPackets.empty() && m_receivedPackets.front().m_sequence <= oldest )
 			m_receivedPackets.pop_front();
 	}
+
+	// resend high priority packets if they still haven't been acked.
+	for(auto resend = m_resend.begin(); resend != m_resend.end(); ++resend)
+		if( resend->m_time > 1.5f * m_timeout )
+		{
+			send(resend->m_packet, resend->m_size, ProtoHeader::PROTO_RESENT);
+			resend->m_time = 0.0f;
+		}
 }
 
 void ProtoConnection::updateStats()
@@ -277,11 +394,15 @@ uint ProtoConnection::makeAck()
 	return ack;
 }
 
-void ProtoConnection::useAck(SequenceNumber ack, uint ackPack)
+void ProtoConnection::useAck(SequenceNumber ack, uint ackPack, bool resent)
 {
-	// there aren't any packets to ack.
 	if( m_unackedPackets.empty() )
 		return;
+
+	if( resent && m_resend.has(ack) )
+		for(auto rp = m_resend.begin(); rp != m_resend.end(); ++rp)
+			if( rp->m_sequence == ack )
+				m_resend.erase(rp);
 
 	auto packet = m_unackedPackets.begin();
 	while( packet != m_unackedPackets.end() )
@@ -341,4 +462,42 @@ std::ostream & operator<<(std::ostream & os, const ConnectionStats & stats)
 	os << "lifetime sent:" << stats.m_sentPackets << " acked: " << stats.m_ackedPackets;
 	os << " received: " << stats.m_receivedPackets << " lost: " << stats.m_lostPackets;
 	return os;
+}
+
+bool operator==(const FlowPacket &lhs, const FlowPacket &rhs)
+{
+	const ubyte highlownorm = ProtoConnection::ProtoHeader::PROTO_HIGH |
+							   ProtoConnection::ProtoHeader::PROTO_LOW | 
+							   ProtoConnection::ProtoHeader::PROTO_NORMAL;
+	ubyte priority = lhs.m_flags & rhs.m_flags;
+	return priority & highlownorm ? true : false;
+}
+
+bool operator!=(const FlowPacket &lhs, const FlowPacket &rhs)
+{
+	return !operator==(lhs, rhs);
+}
+
+bool operator >(const FlowPacket &lhs, const FlowPacket &rhs)
+{
+	// lhs has greater priority iff:
+	// lhs is high priority && rhs is NOT high priority.
+	// lhs is NOT low priority && rhs is low priority.
+	return ((lhs.m_flags & ProtoConnection::ProtoHeader::PROTO_HIGH) && !(rhs.m_flags & ProtoConnection::ProtoHeader::PROTO_HIGH))
+		|| (!(lhs.m_flags & ProtoConnection::ProtoHeader::PROTO_LOW) && (rhs.m_flags & ProtoConnection::ProtoHeader::PROTO_LOW));
+}
+
+bool operator <(const FlowPacket &lhs, const FlowPacket &rhs)
+{
+	return operator>(rhs, lhs);
+}
+
+bool operator>=(const FlowPacket &lhs, const FlowPacket &rhs)
+{
+	return !operator<(lhs, rhs);
+}
+
+bool operator<=(const FlowPacket &lhs, const FlowPacket &rhs)
+{
+	return !operator>(lhs, rhs);
 }

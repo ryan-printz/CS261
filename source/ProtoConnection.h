@@ -56,6 +56,86 @@ public:
 	}
 };
 
+struct ResendPacket
+{
+	SequenceNumber m_sequence;
+	ubyte		   m_packet[256];
+	float		   m_time;
+	uint		   m_size;
+};
+
+class ResendOrderedQueue : public std::list<ResendPacket>
+{
+public:
+	bool has(SequenceNumber no) const
+	{
+		for(const_iterator packet = begin(); packet != end(); ++packet)
+			if( packet->m_sequence == no )
+				return true;
+		return false;
+	}
+
+	void advance(float dt)
+	{
+		for(iterator packet = begin(); packet != end(); ++packet)
+			packet->m_time += dt;
+	}
+
+	void insert(const ResendPacket & rp)
+	{
+		if( empty() )
+		{
+			push_back(rp);
+			return;
+		}
+
+		if( rp.m_sequence <= front().m_sequence )
+			push_front(rp);
+		else if( rp.m_sequence > back().m_sequence )
+			push_back(rp);
+		else
+			for(iterator ipoint = begin(); ipoint != end(); ++ipoint)
+				if( rp.m_sequence < ipoint->m_sequence )
+				{
+					std::list<ResendPacket>::insert(ipoint, rp);
+					break;
+				}
+	}
+};
+
+struct FlowPacket
+{
+	ubyte	m_buffer[256];
+	ubyte	m_flags;
+	uint	m_size;
+};
+
+bool operator==(const FlowPacket &lhs, const FlowPacket &rhs);
+bool operator!=(const FlowPacket &lhs, const FlowPacket &rhs);
+bool operator >(const FlowPacket &lhs, const FlowPacket &rhs);
+bool operator <(const FlowPacket &lhs, const FlowPacket &rhs);
+bool operator>=(const FlowPacket &lhs, const FlowPacket &rhs);
+bool operator<=(const FlowPacket &lhs, const FlowPacket &rhs);
+
+class LinkedPriorityQueue : public std::list<FlowPacket>
+{
+public:
+	void insert(const FlowPacket & fp)
+	{
+		if( empty() )
+			push_back(fp);
+
+		if( fp <= front() )
+			push_front(fp);
+		else if( fp >= back() )
+			push_back(fp);
+		else
+			for(iterator iplace = begin(); iplace != end(); ++iplace)
+				if( fp < *iplace )
+					std::list<FlowPacket>::insert(iplace, fp);
+	};
+};
+
 struct ConnectionStats
 {
 	float m_upBandwidth;
@@ -78,8 +158,11 @@ public:
 	{
 		enum Flags
 		{
-			PROTO_NORMAL = 0x00,
-			PROTO_RESENT = 0x01
+			PROTO_RESENT = 0x01,
+
+			PROTO_HIGH	 = 0x80,
+			PROTO_NORMAL = 0x40,
+			PROTO_LOW	 = 0x20
 		};
 
 		// a constant identifier for the protocol.
@@ -105,7 +188,7 @@ public:
 	virtual bool connected() const;
 
 	virtual int receive(ubyte * buffer, uint len);
-	virtual int send(ubyte * buffer, uint len);
+	virtual int send(ubyte * buffer, uint len, ubyte flags = ProtoHeader::PROTO_NORMAL);
 	virtual void update(float dt);
 
 	virtual std::string connectionInfo() const;
@@ -117,9 +200,12 @@ protected:
 	void updateRTT(float time);
 
 	uint makeAck();
-	void useAck(SequenceNumber ack, uint ackPack);
+	void useAck(SequenceNumber ack, uint ackPack, bool resent);
 	ubyte getBitIndex(const SequenceNumber & lhs, const SequenceNumber & rhs);
-	
+	int noFlowSend(ubyte * buffer, uint len, ubyte flags);
+
+	void updateFlowControl(float dt);
+
 private:
 	// the other receiving endpoint.
 	Socket * m_socket;
@@ -129,9 +215,17 @@ private:
 	bool m_connected;
 	bool m_server;
 	uint m_timeout;
+	uint m_goodRoundTripTime;
 	uint m_keepAliveInterval;
 
 	float m_idleTimer;
+
+	bool m_useFlowControl;
+	float m_flowTimer;
+	float m_sendRate;
+	float m_modeTimer;
+	float m_penaltyTimer;
+	float m_unpenaltyTimer;
 
 	// connection stats
 	ConnectionStats m_stats;
@@ -151,4 +245,7 @@ private:
 	LinkedOrderedQueue m_sentPackets;
 	// used for determining which packets to ack.
 	LinkedOrderedQueue m_receivedPackets;
+
+	ResendOrderedQueue m_resend;
+	LinkedPriorityQueue m_flowControl;
 };
