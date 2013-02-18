@@ -83,20 +83,23 @@ void ConnectionManager::Send (unsigned char * buffer, unsigned bufferLen, HSessi
 }
 
 //******************************************************************************
-int ConnectionManager::Receive (unsigned char * buffer, unsigned bufferLen) {
+int ConnectionManager::Receive (unsigned char * buffer, unsigned bufferLen, HSession& sessionOut) {
     auto connectionItr = m_connections.begin();
     int result = 0;
+    sessionOut = nullptr;
 
     for (; connectionItr != m_connections.end(); ++connectionItr) {
         result = (*connectionItr)->receive(buffer, bufferLen);
 
         if (result != 0)
+            sessionOut = (HSession)(*connectionItr);
             break;
     }
 
     return result;
 }
 
+//******************************************************************************
 void ConnectionManager::Broadcast (unsigned char * buffer, unsigned bufferLen) {
     auto connectionItr = m_connections.begin();
 

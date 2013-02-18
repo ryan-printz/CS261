@@ -96,7 +96,7 @@ bool FileShareServer::Initialize () {
 
 //******************************************************************************
 bool FileShareServer::ShutDown () {
-    //m_engine.ShutDown();
+    m_engine.ShutDown();
     return true;
 }
 

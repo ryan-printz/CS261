@@ -8,7 +8,9 @@
 
 #pragma once
 
+
 #include <unordered_map>
+#include "Serialization.h"
 
 typedef struct DevSession {} * HSession;
 
@@ -28,30 +30,30 @@ public:
     );
     ~Engine ();
     
-    std::string GetSessionInfo (HSession session) const;
-
+    // engine 
     bool Initialize ();
+    void Update (float dt);
+    void ShutDown ();
+
     HSession ConnectTcp (char * remoteIp, unsigned remotePort);
     bool ToggleListenTcp (unsigned port);
-    void Update (float dt);
+
+    // single session specifics
+    std::string GetSessionInfo (HSession session) const;
 
     template <typename T>
-    void Send (T & message, HSession session);
-
-    // This is a temp function until we get some joe up in hurrrrrr.
-    int Receive (unsigned char * buffer, unsigned bufferLen);
+    void Send (T & event, HSession session);
 
 private:
-    // this is a temp message to pack a string
-    void TempPrepareChatMessage (const std::string & message, unsigned char ** buffer, unsigned & bufferLen);
+    void Listen ();
     void Send(unsigned char * buffer, unsigned bufferLen, HSession session);
 
+    // No copy
     Engine (Engine&);
     Engine& operator= (Engine&);
 
 private:
     ConnectionManager * m_connectionManager;
-    // stores port, listener
     std::unordered_map<unsigned, Listener *> m_listenList;
 
     //Callbacks
@@ -65,15 +67,10 @@ void Engine::Send (T & message, HSession session) {
     ubyte * buffer = nullptr;
     unsigned bufferLen = 0;
 
-    // Joe, do something like this to translate message for sending
-    // replace this shit with your stuff in your own file
-    // shouldn't look for just std::string, our messages can be whatever you want
-    // this is just bad code for you to replace
-    TempPrepareChatMessage(message, &buffer, bufferLen);
+    Packer p;
+    p.pack(message, &buffer, bufferLen);
 
-    if (!buffer) {
-        return;
-    }
+    assert(buffer != nullptr);
 
     Send(buffer, bufferLen, session);
 

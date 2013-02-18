@@ -49,6 +49,11 @@ bool Engine::Initialize () {
 }
 
 //******************************************************************************
+void Engine::ShutDown () {
+    cleanSockets();
+}
+
+//******************************************************************************
 HSession Engine::ConnectTcp (char * remoteIp, unsigned remotePort) {
     assert(remoteIp != nullptr);
 
@@ -99,6 +104,27 @@ bool Engine::ToggleListenTcp (unsigned port) {
 
 //******************************************************************************
 void Engine::Update (float dt) {
+    // Listen & Accept new connections
+    Listen();
+
+    // Receive events
+    const unsigned bufferLen = 512;
+    unsigned char buffer[bufferLen];
+
+    HSession session = nullptr;
+    m_connectionManager->Receive(buffer, bufferLen, session);
+
+    while (session != nullptr ) {
+        f_receiveEvent(session, (char *)buffer);
+        m_connectionManager->Receive(buffer, bufferLen, session);
+    }
+
+    // Remove disconnected sessions
+    m_connectionManager->ClearDeleteList();
+}
+
+//******************************************************************************
+void Engine::Listen () {
     auto listenItr = m_listenList.begin();
 
     for (; listenItr != m_listenList.end(); ++listenItr) {
@@ -115,25 +141,9 @@ void Engine::Update (float dt) {
 }
 
 //******************************************************************************
-// just a temp function for chat shit
-void Engine::TempPrepareChatMessage (const std::string & message, unsigned char ** buffer, unsigned & bufferLen) {
-    bufferLen = message.size() + 1;
-    *buffer = new unsigned char[bufferLen];
-    memcpy(*buffer, message.c_str(), message.size());
-    (*buffer)[bufferLen-1] = '\0';
-}
-
-//******************************************************************************
 void Engine::Send (unsigned char * buffer, unsigned bufferLen, HSession session) {
     if (session != nullptr)
         m_connectionManager->Send(buffer, bufferLen, session);
-
     else
         m_connectionManager->Broadcast(buffer, bufferLen);
 } 
-
-//******************************************************************************
-// temp for chat
-int Engine::Receive (unsigned char * buffer, unsigned bufferLen ) {
-    return m_connectionManager->Receive (buffer, bufferLen);
-}
