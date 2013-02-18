@@ -1,9 +1,26 @@
 #include "ProtoConnection.h"
 #include "SequenceNumber.h"
 
+#include <sstream>
+
+const static uint CONNECTION_MESSAGE = 0x5e015d13;
+const static uint KEEP_ALIVE_MESSAGE = 0x1d5e03e7;
+const static uint DISCONNECT_MESSAGE = 0xf70f8c3b;
+
 ProtoConnection::ProtoConnection()
 	: m_socket(nullptr), m_connected(false), m_local(1)
-{}
+{
+	m_stats.m_ackedPackets = m_stats.m_lostPackets 
+						   = m_stats.m_receivedPackets 
+						   = m_stats.m_sentPackets = 0;
+	m_stats.m_roundTripTime = m_stats.m_upBandwidth
+							= m_stats.m_downBandwith = 0.0f;
+
+	m_keepAliveInterval = 0;
+	m_timeout = 0;
+
+	m_idleTimer = 0.0f;
+}
 
 // socket and the destination ip:port pair.
 // the socket should be bound on the server end.
@@ -15,7 +32,8 @@ bool ProtoConnection::accept(Socket * socket)
 	m_socket = socket;
 
 	uint connectionMessage = 0;
-	if( receive((ubyte*)&connectionMessage, sizeof(uint)) < sizeof(uint) || connectionMessage != 0x5e015d13 )
+	if( receive((ubyte*)&connectionMessage, sizeof(uint)) < sizeof(uint) 
+		|| connectionMessage != CONNECTION_MESSAGE )
 		return false;
 
 	m_server = true;
@@ -29,6 +47,7 @@ bool ProtoConnection::connect(char * IP, uint port)
 	m_socket = new Socket();
 
 	m_socket->initializeUDP(Socket::localIP(), port, AF_INET);
+	m_socket->setBlocking(false);
 
 	m_connection.sin_family = AF_INET;
 	m_connection.sin_port = htons(port);
@@ -36,14 +55,15 @@ bool ProtoConnection::connect(char * IP, uint port)
 
 	m_server = false;
 	m_connected = true;
-	const uint connectionMessage = 0x5e015d13;
-	send((ubyte*)&connectionMessage, sizeof(uint));
+	
+	send((ubyte*)&CONNECTION_MESSAGE, sizeof(uint));
 
 	return true;
 }
 
 bool ProtoConnection::disconnect()
 {
+	send((ubyte*)&DISCONNECT_MESSAGE, sizeof(uint));
 	return true;
 }
 
@@ -109,11 +129,19 @@ int ProtoConnection::receive(ubyte * buffer, uint len)
 	ProtoHeader * header = reinterpret_cast<ProtoHeader*>(packet);
 	received -= sizeof(ProtoHeader);
 
+	m_idleTimer = 0.0f;
 	++m_stats.m_receivedPackets;
+
 	// drop duplicate packets.
-	// TODO: unless it's a resend?
 	if( m_receivedPackets.has( header->m_sequence ) )
 		return 0;
+
+	if( header->m_flags & ProtoHeader::PROTO_RESENT )
+	{
+		ProtoHeader * originalHeader = reinterpret_cast<ProtoHeader*>(packet + sizeof(ProtoHeader));
+		// use a pointer to this thing
+		//packet += sizeof(ProtoHeader);
+	}
 
 	PacketInfo info;
 	info.m_sequence	= header->m_sequence;
@@ -130,21 +158,35 @@ int ProtoConnection::receive(ubyte * buffer, uint len)
 	// check out what the packet ack'd
 	useAck(header->m_ack, header->m_acks);
 
+	// don't return keep alive packets.
+	// handle disconnect messages.
+	if( received == sizeof(uint) )
+		if( *(uint*)(packet + sizeof(ProtoHeader)) == KEEP_ALIVE_MESSAGE )
+		{
+			return 0;
+		}
+		else if( *(uint*)(packet + sizeof(ProtoHeader)) == DISCONNECT_MESSAGE );
+		{
+			m_connected = false;
+			return 0;
+		}
+
 	memcpy(buffer, packet + sizeof(ProtoHeader), received);
 
 	return received;
 }
 
-// TODO: keep alive
 void ProtoConnection::update(float dt)
 {
 	// get a little bit closer to timing out.
 	m_idleTimer += dt;
 
 	if( m_keepAliveInterval && !((int)m_idleTimer % m_keepAliveInterval) )
-	{}
+	{
+		send((ubyte*)&KEEP_ALIVE_MESSAGE, sizeof(uint));
+	}
 
-	if( m_idleTimer > m_timeout )
+	if( m_timeout && m_idleTimer > m_timeout )
 	{
 		m_connected = false;
 	}
@@ -206,18 +248,16 @@ void ProtoConnection::updateStats()
 
 std::string ProtoConnection::connectionInfo() const
 {
-	std::string info = "UDP Connection:";
+	std::stringstream info;
+	info << "UDP Connection:";
 
 	if( !m_socket )
-	{
-		char buffer[16];
-		_itoa_s<16>(ntohs(m_connection.sin_port), buffer, 10);
-		info.append(" ").append(inet_ntoa(m_connection.sin_addr)).append(":").append(buffer);
-	}
+		info << " " << inet_ntoa(m_connection.sin_addr) << ":" << ntohs(m_connection.sin_port) 
+			 << std::endl << m_stats;
 	else
-		info + " not connected.";
+		info << " not connected.";
 
-	return info;
+	return info.str();
 }
 
 // builds an ack pack.

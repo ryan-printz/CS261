@@ -76,6 +76,12 @@ class ProtoConnection : public IConnection
 public: 
 	struct ProtoHeader
 	{
+		enum Flags
+		{
+			PROTO_NORMAL = 0x00,
+			PROTO_RESENT = 0x01
+		};
+
 		// a constant identifier for the protocol.
 		// packets that don't have this are ignored.
 		ProtoHeader() : m_protocol(0xb4639620) {}
@@ -84,6 +90,7 @@ public:
 		SequenceNumber	m_sequence;
 		SequenceNumber	m_ack;
 		uint			m_acks;
+		byte			m_flags;
 
 		bool valid() { return m_protocol == 0xb4639620; };
 	};
