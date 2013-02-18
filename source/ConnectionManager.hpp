@@ -20,9 +20,10 @@ public:
     ConnectionManager  () {}
     ~ConnectionManager ();
     
-    void Add    (IConnection * connection);
-    void Remove (IConnection * connection);
-    void Send   (unsigned char * buffer, unsigned bufferLen, HSession session);
+    void Add       (IConnection * connection);
+    void Remove    (IConnection * connection);
+    void Send      (unsigned char * buffer, unsigned bufferLen, HSession session);
+    void Broadcast (unsigned char * buffer, unsigned bufferLen);
 
     int Receive (unsigned char * buffer, unsigned bufferLen);
 

@@ -23,7 +23,7 @@ int main(void)
         bool newInput = CheckInput(buffer);
 
         if (newInput) {
-            Test.Send(buffer, testSession);
+            Test.Send(buffer, nullptr);
             buffer.clear();
         }
         buffer.resize(256);
@@ -34,7 +34,7 @@ int main(void)
             printf(buffer.c_str());
         }
 
-        buffer.clear();
+        //buffer.clear();
     }
 
     // cleanup.

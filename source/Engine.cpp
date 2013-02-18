@@ -108,7 +108,11 @@ void Engine::TempPrepareChatMessage (const std::string & message, unsigned char 
 
 //******************************************************************************
 void Engine::Send (unsigned char * buffer, unsigned bufferLen, HSession session) {
-    m_connectionManager->Send(buffer, bufferLen, session);
+    if (session != nullptr)
+        m_connectionManager->Send(buffer, bufferLen, session);
+
+    else
+        m_connectionManager->Broadcast(buffer, bufferLen);
 } 
 
 //******************************************************************************

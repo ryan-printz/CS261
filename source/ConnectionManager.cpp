@@ -86,3 +86,10 @@ int ConnectionManager::Receive (unsigned char * buffer, unsigned bufferLen) {
     return result;
 }
 
+void ConnectionManager::Broadcast (unsigned char * buffer, unsigned bufferLen) {
+    auto connectionItr = m_connections.begin();
+
+    for (; connectionItr != m_connections.end(); ++connectionItr) {
+        (*connectionItr)->send(buffer, bufferLen);
+    }
+}

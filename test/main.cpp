@@ -5,6 +5,8 @@
 
 #include <iostream>
 
+
+
 bool InitServerTest (Engine & engine) {
 
     if(!initSockets(true))
@@ -30,12 +32,13 @@ int main(void)
     std::string buffer;
 
     while (1) {
-        double dt = timer.Update();
 
         bool newInput = CheckInput(buffer);
         
+        testEngine.Update(timer.Update());
+
         if (newInput) {
-            // send call should go here
+            testEngine.Send(buffer, nullptr);
             buffer.clear();
         }
         buffer.resize(256);
@@ -45,7 +48,6 @@ int main(void)
         if (result != 0) {
             printf(buffer.c_str());
         }
-
 
     }
 

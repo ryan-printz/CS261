@@ -280,8 +280,9 @@ Socket Socket::accept()
 	// returns a new socket that the connection is actually made on.
 	accepted.m_socket = ::accept(m_socket, (SOCKADDR*)&accepted.m_address, &addrlen);
 
-	if( accepted.m_socket != INVALID_SOCKET )
+	if( accepted.m_socket != INVALID_SOCKET ) {
 		accepted.m_isConnected = true;
+    }
 	else
 		m_error = WSAGetLastError();
 
