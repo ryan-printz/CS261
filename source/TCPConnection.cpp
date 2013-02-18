@@ -33,6 +33,11 @@ bool TCPConnection::connect(char * ip, uint port)
 void TCPConnection::update(float dt)
 {}
 
+bool TCPConnection::connected() const
+{
+	return m_connection.connected();
+}
+
 int TCPConnection::receive(ubyte * buffer, uint bufferlen)
 {
 	if( m_connection.invalid() ) 

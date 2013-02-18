@@ -15,6 +15,8 @@ public:
 	virtual bool cleanup() = 0;
 	virtual bool disconnect() = 0;
 
+	virtual bool connected() const = 0;
+
 	// send/receive
 	virtual int receive(ubyte * buffer, uint len) = 0;
 	virtual int send(ubyte * buffer, uint len) = 0;

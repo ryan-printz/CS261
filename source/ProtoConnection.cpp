@@ -329,6 +329,11 @@ ubyte ProtoConnection::getBitIndex(const SequenceNumber & lhs, const SequenceNum
 		return rhs - 1 - lhs;
 }
 
+bool ProtoConnection::connected() const
+{
+	return m_connected;
+}
+
 std::ostream & operator<<(std::ostream & os, const ConnectionStats & stats)
 {
 	std::ostream::sentry ok(os);

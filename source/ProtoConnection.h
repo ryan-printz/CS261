@@ -101,9 +101,13 @@ public:
 	virtual bool connect(char * ip, uint port);
 	virtual bool cleanup();
 	virtual bool disconnect();
+
+	virtual bool connected() const;
+
 	virtual int receive(ubyte * buffer, uint len);
 	virtual int send(ubyte * buffer, uint len);
 	virtual void update(float dt);
+
 	virtual std::string connectionInfo() const;
 
 	const ConnectionStats& getConnectionStats() const; 

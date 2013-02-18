@@ -13,6 +13,8 @@ public:
 	virtual bool cleanup();
 	virtual bool disconnect();
 
+	virtual bool connected() const;
+
 	virtual int send(ubyte * buffer, uint bufferlen);
 	virtual int receive(ubyte * buffer, uint bufferlen);
 
