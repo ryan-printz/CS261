@@ -1,5 +1,5 @@
-#include "Engine.h"
 #include "Socket.h"
+#include "ProtoConnection.h"
 
 #include <iostream>
 
@@ -8,16 +8,14 @@ int main(void)
     if( !initSockets(true) )
         return 1;
 
-    Engine Test;
+	IConnection * udpconnection = new ProtoConnection();
 
-    HSession testSession = Test.ConnectTcp("192.168.1.101", 4001);
+	udpconnection->connect(Socket::localIP(), 3000);
 
-    std::string testMessage("Message Fucking Received.");
-    Test.Send(testMessage, testSession);
+	const char buffer[] = "Message Fucking Received.";
+	udpconnection->send((ubyte*)buffer, sizeof(buffer));
 
-    while (1) {
-        Test.Update(0);
-    }
+	std::getchar();
 
     // cleanup.
     cleanSockets();

@@ -26,8 +26,10 @@
   <ItemGroup>
     <ClCompile Include="..\source\ConnectionManager.cpp" />
     <ClCompile Include="..\source\Engine.cpp" />
+    <ClCompile Include="..\source\IConnection.cpp" />
     <ClCompile Include="..\source\InputThreading.cpp" />
     <ClCompile Include="..\source\Listener.cpp" />
+    <ClCompile Include="..\source\SequenceNumber.cpp" />
     <ClCompile Include="..\source\Socket.cpp" />
     <ClCompile Include="..\source\TCPConnection.cpp" />
     <ClCompile Include="..\source\ProtoConnection.cpp" />

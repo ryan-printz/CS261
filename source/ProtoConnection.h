@@ -68,14 +68,7 @@ struct ConnectionStats
 	int m_ackedPackets;
 };
 
-std::ostream & operator<<(std::ostream & os, const ConnectionStats & stats)
-{
-	std::ostream::sentry ok(os);
-	os << stats.m_upBandwidth << "/" << stats.m_downBandwith << "up/down. ping: " << stats.m_roundTripTime << std::endl; 
-	os << "lifetime sent:" << stats.m_sentPackets << " acked: " << stats.m_ackedPackets;
-	os << " received: " << stats.m_receivedPackets << " lost: " << stats.m_lostPackets;
-	return os;
-}
+std::ostream & operator<<(std::ostream & os, const ConnectionStats & stats);
 
 // this isn't really a connection, it just acts like one.
 class ProtoConnection : public IConnection
@@ -96,34 +89,38 @@ public:
 	};
 
 	ProtoConnection();
-	bool connect(char * ip, uint port);
-	bool connect(Socket * open, char * ip, uint port);
-	bool cleanUp();
+
+	virtual bool accept(Socket * open);
+	virtual bool connect(char * ip, uint port);
+	virtual bool cleanup();
+	virtual bool disconnect();
 	virtual int receive(ubyte * buffer, uint len);
 	virtual int send(ubyte * buffer, uint len);
 	virtual void update(float dt);
 	virtual std::string connectionInfo() const;
 
-private:
+	const ConnectionStats& getConnectionStats() const; 
+
+protected:
 	void updateStats();
 	void updateRTT(float time);
 
 	uint makeAck();
 	void useAck(SequenceNumber ack, uint ackPack);
 	ubyte getBitIndex(const SequenceNumber & lhs, const SequenceNumber & rhs);
-
-	bool m_connected;
-	bool m_isClient;
 	
+private:
 	// the other receiving endpoint.
 	Socket * m_socket;
 	NetAddress m_connection;
 
-	float m_idleTimer;
-
 	// connection properties
+	bool m_connected;
+	bool m_server;
 	uint m_timeout;
 	uint m_keepAliveInterval;
+
+	float m_idleTimer;
 
 	// connection stats
 	ConnectionStats m_stats;

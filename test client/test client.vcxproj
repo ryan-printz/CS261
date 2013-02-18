@@ -86,6 +86,7 @@
     <ClInclude Include="..\source\IDecorator.h" />
     <ClInclude Include="..\source\Listener.h" />
     <ClInclude Include="..\source\ProtoConnection.h" />
+    <ClInclude Include="..\source\SequenceNumber.h" />
     <ClInclude Include="..\source\Socket.h" />
     <ClInclude Include="..\source\TCPConnection.h" />
     <ClInclude Include="..\source\Types.h" />
@@ -93,8 +94,10 @@
   <ItemGroup>
     <ClCompile Include="..\source\ConnectionManager.cpp" />
     <ClCompile Include="..\source\Engine.cpp" />
+    <ClCompile Include="..\source\IConnection.cpp" />
     <ClCompile Include="..\source\Listener.cpp" />
     <ClCompile Include="..\source\ProtoConnection.cpp" />
+    <ClCompile Include="..\source\SequenceNumber.cpp" />
     <ClCompile Include="..\source\Socket.cpp" />
     <ClCompile Include="..\source\TCPConnection.cpp" />
     <ClCompile Include="main.cpp" />

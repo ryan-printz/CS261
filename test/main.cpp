@@ -1,6 +1,5 @@
-#include "Engine.h"
 #include "Socket.h"
-#include "InputThreading.h"
+#include "ProtoConnection.h"
 
 #include <iostream>
 
@@ -9,22 +8,21 @@ int main(void)
 	if( !initSockets(true) )
 		return 1;
 
-	Engine Test;
+	Socket udpsocket;
+	udpsocket.initializeUDP(Socket::localIP(), 3000);
+	udpsocket.bind();
+	udpsocket.setBlocking(true);
 
-    Test.ToggleListenTcp(4001);
+	IConnection * udpconnection = new ProtoConnection();
+	if( udpconnection->accept(&udpsocket) )
+		std::cout << "client connected" << std::endl;
 
-    while (1) {
-        Test.Update(0);
+	char buffer[256];
+	while( !udpconnection->receive((ubyte*)buffer, 256) );
 
-        unsigned char buffer[256];
-
-        int result = Test.Receive(buffer, 256);
-
-        if (result != 0) {
-            printf((const char *)buffer);
-            break;
-        }
-    }
+	std::cout << buffer << std::endl;
+	
+	std::getchar();
 
 	// cleanup.
 	cleanSockets();

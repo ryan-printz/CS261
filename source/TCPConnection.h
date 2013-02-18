@@ -8,15 +8,16 @@ class TCPConnection : public IConnection
 public:
 	TCPConnection();
 
-	// takes a reference to a Socket 
-	// in listening mode.
-	bool connect(Socket * listener);
-	bool connect(char * ip, uint port);
-
-	void close();
+	virtual bool accept(Socket * open);
+	virtual bool connect(char * ip, uint port);
+	virtual bool cleanup();
+	virtual bool disconnect();
 
 	virtual int send(ubyte * buffer, uint bufferlen);
 	virtual int receive(ubyte * buffer, uint bufferlen);
+
+	virtual void update(float dt);
+
 	virtual std::string connectionInfo() const;
 
 protected:

@@ -1,87 +1,25 @@
 #include "ProtoConnection.h"
+#include "SequenceNumber.h"
 
 ProtoConnection::ProtoConnection()
-	: m_socket(nullptr), m_isClient(false), m_connected(false)
+	: m_socket(nullptr), m_connected(false), m_local(1)
 {}
-
-// builds an ack pack.
-uint ProtoConnection::makeAck()
-{
-	uint ack = 0;
-	for(auto it = m_receivedPackets.begin(); it != m_receivedPackets.end(); ++it)
-	{
-		if( it->m_sequence == m_remote || it->m_sequence > m_remote )
-			break;
-
-		ubyte bitIndex = getBitIndex(it->m_sequence, m_remote);
-		if( bitIndex < 32 )
-			ack |= 1 << bitIndex;
-	}
-
-	return ack;
-}
-
-void ProtoConnection::useAck(SequenceNumber ack, uint ackPack)
-{
-	// there aren't any packets to ack.
-	if( m_unackedPackets.empty() )
-		return;
-
-	auto packet = m_unackedPackets.begin();
-	while( packet != m_unackedPackets.end() )
-	{
-		bool packetAcked = false;
-		
-		if(packet->m_sequence == ack)
-			packetAcked = true;
-		else if( packet->m_sequence <= ack )
-		{
-			int bitIndex = getBitIndex(packet->m_sequence, ack);
-			if( bitIndex < 32 )
-				packetAcked = (ackPack >> bitIndex) & 1;
-		}
-
-		if( packetAcked )
-		{
-			// update stats.
-			++m_stats.m_ackedPackets;
-			updateRTT(packet->m_time);
-
-			// move the packet to the acked queue
-			// remove it from unacked.
-			// set it as acked this update.
-			m_ackedPackets.insert(*packet);
-			m_acks.push_back(packet->m_sequence);
-			packet = m_unackedPackets.erase( packet );
-		}
-		else
-			++packet;
-	}
-}
-
-// updates the round trip time with a running average.
-void ProtoConnection::updateRTT(float time)
-{
-	m_stats.m_roundTripTime += (time - m_stats.m_roundTripTime) * 0.1f;
-}
-
-ubyte ProtoConnection::getBitIndex(const SequenceNumber & lhs, const SequenceNumber & rhs)
-{
-	if( lhs > rhs )
-		return rhs + (std::numeric_limits<uint>::max() - lhs);
-	else
-		return rhs - 1 - lhs;
-}
 
 // socket and the destination ip:port pair.
 // the socket should be bound on the server end.
-bool ProtoConnection::connect(Socket * socket, char * IP, uint port)
+bool ProtoConnection::accept(Socket * socket)
 {
+	if( m_connected )
+		return false;
+
 	m_socket = socket;
 
-	m_connection.sin_family = AF_INET;
-	m_connection.sin_port = htons(port);
-	m_connection.sin_addr.s_addr = inet_addr(IP);
+	uint connectionMessage = 0;
+	if( receive((ubyte*)&connectionMessage, sizeof(uint)) < sizeof(uint) || connectionMessage != 0x5e015d13 )
+		return false;
+
+	m_server = true;
+	m_connected = true;
 
 	return true;
 }
@@ -96,14 +34,22 @@ bool ProtoConnection::connect(char * IP, uint port)
 	m_connection.sin_port = htons(port);
 	m_connection.sin_addr.s_addr = inet_addr(IP);
 
-	m_isClient = true;
+	m_server = false;
+	m_connected = true;
+	const uint connectionMessage = 0x5e015d13;
+	send((ubyte*)&connectionMessage, sizeof(uint));
 
 	return true;
 }
 
-bool ProtoConnection::cleanUp()
+bool ProtoConnection::disconnect()
 {
-	if( m_isClient ) 
+	return true;
+}
+
+bool ProtoConnection::cleanup()
+{
+	if( !m_server ) 
 	{
 		m_socket->cleanUp();
 		delete m_socket;
@@ -127,7 +73,7 @@ int ProtoConnection::send(ubyte * buffer, uint len)
 	memcpy( packet, &header, sizeof(ProtoHeader) );
 	memcpy( packet + sizeof(ProtoHeader), buffer, len );
 
-	if( m_socket->send(packet, len, &m_connection) != len )
+	if( m_socket->send(packet, len + sizeof(ProtoHeader), &m_connection) != len + sizeof(ProtoHeader) )
 		return 0;
 
 	// store info about this packet for stats.
@@ -149,9 +95,6 @@ int ProtoConnection::send(ubyte * buffer, uint len)
 int ProtoConnection::receive(ubyte * buffer, uint len)
 {
 	ubyte packet[256];
-
-	if( len <= sizeof(ProtoHeader) )
-		return 0;
 
 	NetAddress from;
 	int received = m_socket->receive(packet, 256, &from);
@@ -275,4 +218,82 @@ std::string ProtoConnection::connectionInfo() const
 		info + " not connected.";
 
 	return info;
+}
+
+// builds an ack pack.
+uint ProtoConnection::makeAck()
+{
+	uint ack = 0;
+	for(auto it = m_receivedPackets.begin(); it != m_receivedPackets.end(); ++it)
+	{
+		if( it->m_sequence == m_remote || it->m_sequence > m_remote )
+			break;
+
+		ubyte bitIndex = getBitIndex(it->m_sequence, m_remote);
+		if( bitIndex < 32 )
+			ack |= 1 << bitIndex;
+	}
+
+	return ack;
+}
+
+void ProtoConnection::useAck(SequenceNumber ack, uint ackPack)
+{
+	// there aren't any packets to ack.
+	if( m_unackedPackets.empty() )
+		return;
+
+	auto packet = m_unackedPackets.begin();
+	while( packet != m_unackedPackets.end() )
+	{
+		bool packetAcked = false;
+		
+		if(packet->m_sequence == ack)
+			packetAcked = true;
+		else if( packet->m_sequence <= ack )
+		{
+			int bitIndex = getBitIndex(packet->m_sequence, ack);
+			if( bitIndex < 32 )
+				packetAcked = (ackPack >> bitIndex) & 1;
+		}
+
+		if( packetAcked )
+		{
+			// update stats.
+			++m_stats.m_ackedPackets;
+			updateRTT(packet->m_time);
+
+			// move the packet to the acked queue
+			// remove it from unacked.
+			// set it as acked this update.
+			m_ackedPackets.insert(*packet);
+			m_acks.push_back(packet->m_sequence);
+			packet = m_unackedPackets.erase( packet );
+		}
+		else
+			++packet;
+	}
+}
+
+// updates the round trip time with a running average.
+void ProtoConnection::updateRTT(float time)
+{
+	m_stats.m_roundTripTime += (time - m_stats.m_roundTripTime) * 0.1f;
+}
+
+ubyte ProtoConnection::getBitIndex(const SequenceNumber & lhs, const SequenceNumber & rhs)
+{
+	if( lhs > rhs )
+		return rhs + (std::numeric_limits<uint>::max() - lhs);
+	else
+		return rhs - 1 - lhs;
+}
+
+std::ostream & operator<<(std::ostream & os, const ConnectionStats & stats)
+{
+	std::ostream::sentry ok(os);
+	os << stats.m_upBandwidth << "/" << stats.m_downBandwith << "up/down. ping: " << stats.m_roundTripTime << std::endl; 
+	os << "lifetime sent:" << stats.m_sentPackets << " acked: " << stats.m_ackedPackets;
+	os << " received: " << stats.m_receivedPackets << " lost: " << stats.m_lostPackets;
+	return os;
 }

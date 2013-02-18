@@ -53,10 +53,10 @@ IConnection * Listener::Listen () {
     switch (m_type) {
     case LISTEN_TCP:
         {
-            bool success = reinterpret_cast<TCPConnection *>(m_connection)->connect(m_socket);
+            bool success = m_connection->accept(m_socket);
             if (success) {
                 newConnection = m_connection;
-                m_connection = reinterpret_cast<IConnection*>(new TCPConnection);
+                m_connection = new TCPConnection;
             }
         }
         break;

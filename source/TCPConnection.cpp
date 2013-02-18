@@ -4,7 +4,7 @@
 TCPConnection::TCPConnection()
 {}
 
-bool TCPConnection::connect(Socket * listener)
+bool TCPConnection::accept(Socket * listener)
 {
 	Socket accepted = listener->accept();
 
@@ -24,6 +24,9 @@ bool TCPConnection::connect(char * ip, uint port)
 
 	return true;
 }
+
+void TCPConnection::update(float dt)
+{}
 
 int TCPConnection::receive(ubyte * buffer, uint bufferlen)
 {
@@ -57,7 +60,12 @@ std::string TCPConnection::connectionInfo() const
 	return info;
 }
 
-void TCPConnection::close()
+bool TCPConnection::disconnect()
 {
-	m_connection.cleanUp();	
+	return true;
+}
+
+bool TCPConnection::cleanup()
+{
+	return m_connection.cleanUp();	
 }
