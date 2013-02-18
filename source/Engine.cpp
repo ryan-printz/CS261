@@ -13,7 +13,7 @@
 #include "TCPConnection.h"
 
 //******************************************************************************
-Engine::Engine () {
+Engine::Engine () : f_newSession(nullptr) {
     m_connectionManager = new ConnectionManager;
 }
 
@@ -22,7 +22,13 @@ Engine::~Engine () {
     if (m_connectionManager)
         delete m_connectionManager;
 
-    // must clear listeners here
+    auto listenItr = m_listenList.begin();
+
+    while (listenItr != m_listenList.end()) {
+        if (listenItr->second != nullptr)
+            delete listenItr->second;
+        listenItr = m_listenList.erase(listenItr);
+    }
 }
 
 //******************************************************************************
@@ -83,6 +89,9 @@ void Engine::Update (float dt) {
 
         while (newConnection != nullptr) {
             m_connectionManager->Add(newConnection);
+            if (f_newSession) {
+                f_newSession((HSession)newConnection);
+            }
             newConnection = listenItr->second->Listen();
         }
     }
@@ -106,4 +115,9 @@ void Engine::Send (unsigned char * buffer, unsigned bufferLen, HSession session)
 // temp for chat
 int Engine::Receive (unsigned char * buffer, unsigned bufferLen ) {
     return m_connectionManager->Receive (buffer, bufferLen);
+}
+
+//******************************************************************************
+void Engine::RegisterCallbacks (FSessionAcceptedCallback cb) {
+    f_newSession = cb;
 }

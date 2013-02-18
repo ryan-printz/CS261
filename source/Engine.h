@@ -20,16 +20,25 @@ public:
     Engine ();
     ~Engine ();
 
+    void Initialize ();
+
     const HSession ConnectTcp (char * remoteIp, unsigned remotePort);
 
     // returns if the port is now listening
     bool ToggleListenTcp (unsigned port);
+
     void Update (float dt);
 
     template <typename T>
     void Send (T & message, HSession session);
+
     // This is a temp function until we get some joe up in hurrrrrr.
     int Receive (unsigned char * buffer, unsigned bufferLen);
+
+    //Callbacks
+    typedef void (*FSessionAcceptedCallback) (HSession);
+    typedef void (*FReceiveEventCallback) (HSession);
+    void RegisterCallbacks (FSessionAcceptedCallback callback);
 
 private:
     // this is a temp message to pack a string
@@ -43,6 +52,9 @@ private:
     ConnectionManager * m_connectionManager;
     // stores port, listener
     std::unordered_map<unsigned, Listener *> m_listenList;
+
+    //Callbacks
+    FSessionAcceptedCallback f_newSession;
 };
 
 template <typename T>

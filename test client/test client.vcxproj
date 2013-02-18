@@ -93,6 +93,7 @@
   <ItemGroup>
     <ClCompile Include="..\source\ConnectionManager.cpp" />
     <ClCompile Include="..\source\Engine.cpp" />
+    <ClCompile Include="..\source\InputThreading.cpp" />
     <ClCompile Include="..\source\Listener.cpp" />
     <ClCompile Include="..\source\ProtoConnection.cpp" />
     <ClCompile Include="..\source\Socket.cpp" />

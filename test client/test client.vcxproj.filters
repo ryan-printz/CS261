@@ -19,5 +19,6 @@
     <ClCompile Include="..\source\Engine.cpp" />
     <ClCompile Include="..\source\Listener.cpp" />
     <ClCompile Include="..\source\ProtoConnection.cpp" />
+    <ClCompile Include="..\source\InputThreading.cpp" />
   </ItemGroup>
 </Project>

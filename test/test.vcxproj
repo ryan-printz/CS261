@@ -19,6 +19,7 @@
     <ClInclude Include="..\source\Listener.h" />
     <ClInclude Include="..\source\Socket.h" />
     <ClInclude Include="..\source\TCPConnection.h" />
+    <ClInclude Include="..\source\Timer.h" />
     <ClInclude Include="..\source\Types.h" />
     <ClInclude Include="..\source\ProtoConnection.h" />
   </ItemGroup>
@@ -30,6 +31,7 @@
     <ClCompile Include="..\source\Socket.cpp" />
     <ClCompile Include="..\source\TCPConnection.cpp" />
     <ClCompile Include="..\source\ProtoConnection.cpp" />
+    <ClCompile Include="..\source\Timer.cpp" />
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">

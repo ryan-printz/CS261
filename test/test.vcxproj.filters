@@ -17,6 +17,7 @@
       <Filter>Engine</Filter>
     </ClInclude>
     <ClInclude Include="..\source\InputThreading.h" />
+    <ClInclude Include="..\source\Timer.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp" />
@@ -33,6 +34,7 @@
       <Filter>Engine</Filter>
     </ClCompile>
     <ClCompile Include="..\source\InputThreading.cpp" />
+    <ClCompile Include="..\source\Timer.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="ConnectionManager">

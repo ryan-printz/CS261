@@ -1,32 +1,57 @@
 #include "Engine.h"
 #include "Socket.h"
 #include "InputThreading.h"
+#include "Timer.h"
 
 #include <iostream>
 
+bool InitServerTest (Engine & engine) {
+
+    if(!initSockets(true))
+        return false;
+
+    if (!engine.ToggleListenTcp(4001))
+        return false;
+
+    if (!StartInputThread())
+        return false;
+
+    return true;
+}
+
+
 int main(void)
 {
-	if( !initSockets(true) )
-		return 1;
+	Engine testEngine;
+    InitServerTest(testEngine);
 
-	Engine Test;
+    Timer timer;
 
-    Test.ToggleListenTcp(4001);
+    std::string buffer;
 
     while (1) {
-        Test.Update(0);
+        double dt = timer.Update();
 
-        unsigned char buffer[256];
+        bool newInput = CheckInput(buffer);
+        
+        if (newInput) {
+            // send call should go here
+            buffer.clear();
+        }
+        buffer.resize(256);
 
-        int result = Test.Receive(buffer, 256);
+        int result = testEngine.Receive((unsigned char *)&buffer.front(), 256);
 
         if (result != 0) {
-            printf((const char *)buffer);
-            break;
+            printf(buffer.c_str());
         }
+
+
     }
 
 	// cleanup.
 	cleanSockets();
+    StopInputThread();
+
 	return 0;
 }
