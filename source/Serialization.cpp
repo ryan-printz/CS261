@@ -3,7 +3,9 @@
 
 int m_sizeArray[6] = {	sizeof(int), sizeof(float), sizeof(char),sizeof(unsigned),
 						sizeof(unsigned), sizeof(int) };
-types BaseEvent::def[1] = {TYPE_END};
+int Packer::m_sizeArray[6] = {	sizeof(int), sizeof(float), sizeof(char),sizeof(unsigned),
+						sizeof(unsigned), sizeof(int) };
+types BaseEvent::def[1]  = {TYPE_END};
 types TestEvent1::def[3] = {TYPE_INT, TYPE_FLOAT, TYPE_END};
 types TestEvent2::def[3] = {TYPE_UARRAYSIZE, TYPE_INT, TYPE_END};
 
@@ -55,10 +57,10 @@ void pack(BaseEvent E, char* buf)
 		}
 	}
 }
-
+///////////////////////////////////////////////////////////////
 void unpack(BaseEvent E, char* buf)
 {
-		char* current = (char*)(&E);
+	char* current = (char*)(&E);
 	
 	for(int i = 0; E.def[i] != TYPE_END; ++i)
 	{
@@ -67,11 +69,11 @@ void unpack(BaseEvent E, char* buf)
 		case TYPE_UARRAYSIZE:
 			unsigned temp;
 			memcpy(&temp, current, m_sizeArray[TYPE_UARRAYSIZE]);
-			memcpy(buf, current, m_sizeArray[TYPE_UARRAYSIZE]);
+			memcpy(current, buf, m_sizeArray[TYPE_UARRAYSIZE]);
 			buf += m_sizeArray[TYPE_UARRAYSIZE];
 			current += m_sizeArray[TYPE_UARRAYSIZE];
 			++i;
-			memcpy(buf, (char*)(*current), m_sizeArray[E.def[i]] * temp);
+			memcpy(current, *(char**)(buf), 4);
 			current += 4;
 			buf += m_sizeArray[E.def[i]] * temp;
 			break;

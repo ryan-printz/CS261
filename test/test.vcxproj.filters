@@ -19,6 +19,7 @@
     <ClInclude Include="..\source\InputThreading.h" />
     <ClInclude Include="..\source\Timer.h" />
     <ClInclude Include="..\source\SequenceNumber.h" />
+    <ClInclude Include="..\source\Serialization.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp" />
@@ -34,10 +35,11 @@
     <ClCompile Include="..\source\Engine.cpp">
       <Filter>Engine</Filter>
     </ClCompile>
-	<ClCompile Include="..\source\InputThreading.cpp" />
+    <ClCompile Include="..\source\InputThreading.cpp" />
     <ClCompile Include="..\source\Timer.cpp" />
     <ClCompile Include="..\source\SequenceNumber.cpp" />
     <ClCompile Include="..\source\IConnection.cpp" />
+    <ClCompile Include="..\source\Serialization.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="ConnectionManager">
