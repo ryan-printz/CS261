@@ -16,9 +16,11 @@ class Packer
 {
 public:
 	template <typename T>
-	void pack(T &E, ubyte ** buf, unsigned & bufferLen)
+	void pack(T &E, ubyte ** buffer, unsigned & bufferLen)
 	{
-        CreatePackBuffer(E, buf, bufferLen);
+        CreatePackBuffer(E, buffer, bufferLen);
+
+        ubyte * buf = *buffer;
 
 		ubyte * current = (ubyte*)(&E);
 	
@@ -29,17 +31,17 @@ public:
 			case TYPE_UARRAYSIZE:
 				unsigned temp;
 				memcpy(&temp, current, m_sizeArray[TYPE_UARRAYSIZE]);
-				memcpy(*buf, current, m_sizeArray[TYPE_UARRAYSIZE]);
-				*buf += m_sizeArray[TYPE_UARRAYSIZE];
+				memcpy(buf, current, m_sizeArray[TYPE_UARRAYSIZE]);
+				buf += m_sizeArray[TYPE_UARRAYSIZE];
 				current += m_sizeArray[TYPE_UARRAYSIZE];
 				++i;
-				memcpy(*buf, *(ubyte**)(current), m_sizeArray[E.def[i]] * temp);
+				memcpy(buf, *(ubyte**)(current), m_sizeArray[E.def[i]] * temp);
 				current += 4;
-				*buf += m_sizeArray[E.def[i]] * temp;
+				buf += m_sizeArray[E.def[i]] * temp;
 				break;
 			default:
-				memcpy(*buf, current, m_sizeArray[E.def[i]]);
-				*buf += m_sizeArray[E.def[i]];
+				memcpy(buf, current, m_sizeArray[E.def[i]]);
+				buf += m_sizeArray[E.def[i]];
 				current += m_sizeArray[E.def[i]];
 				break;
 			}
@@ -92,9 +94,10 @@ private:
             case TYPE_UARRAYSIZE:
                 {
                     unsigned temp;
-                    memcpy(&temp, *buffer, m_sizeArray[TYPE_UARRAYSIZE]);
-                    bufferLen += m_sizeArray[TYPE_UARRAYSIZE] + sizeof(void*);
+                    memcpy(&temp, (ubyte*)(&E) + bufferLen, m_sizeArray[TYPE_UARRAYSIZE]);
+                    bufferLen += m_sizeArray[TYPE_UARRAYSIZE];
                     ++i;
+                    bufferLen += m_sizeArray[E.def[i]]*temp;
                     break;
                 }
             default:
@@ -105,7 +108,7 @@ private:
         unsigned paddingBytes = sizeof(void*) - (bufferLen % sizeof(void*));
         bufferLen += paddingBytes;
         
-        *buffer = new unsigned char[bufferLen];
+        (*buffer) = new ubyte[bufferLen];
     }
 	static int m_sizeArray[];
 };

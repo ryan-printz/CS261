@@ -8,8 +8,10 @@ bool TCPConnection::accept(Socket * listener)
 {
 	Socket accepted = listener->accept();
 
-	if( !accepted.invalid() )
+	if( !accepted.invalid() ) {
 		m_connection = accepted;
+        m_connection.setBlocking(false);
+    }
 
 	return !accepted.invalid();
 }
@@ -21,6 +23,9 @@ bool TCPConnection::connect(char * ip, uint port)
 
 	if( !m_connection.connect() )
 		return false;
+
+    if (!m_connection.setBlocking(false))
+        return false;
 
 	return true;
 }

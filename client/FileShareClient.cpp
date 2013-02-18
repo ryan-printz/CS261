@@ -104,8 +104,12 @@ bool FileShareClient::Initialize () {
     stream.close();
 
     // connect to tcp server
-    if (success)
-        success = m_engine.ConnectTcp(serverAddress, atoi(serverPort));
+    if (success) {
+        m_tcpServer = m_engine.ConnectTcp(serverAddress, atoi(serverPort));
+
+        if (m_tcpServer == nullptr)
+            success = false;
+    }
 
     // start listening on udp
     //m_engine.ToggleListenUdp(atoi(udpListenPort));

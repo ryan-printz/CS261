@@ -75,5 +75,5 @@ void Engine::Send (T & message, HSession session) {
 
     Send(buffer, bufferLen, session);
 
-    delete buffer;
+    delete [] buffer;
 }
