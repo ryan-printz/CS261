@@ -71,8 +71,6 @@ void Engine::Send (T & message, HSession session) {
     Packer p;
     p.pack(message, &buffer, bufferLen);
 
-    assert(buffer != nullptr);
-
     Send(buffer, bufferLen, session);
 
     delete [] buffer;

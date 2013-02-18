@@ -39,12 +39,12 @@ void ReceiveEventCallback (HSession session, ubyte * data) {
             Packer p;
             p.unpack(e, data);
             printf("Received print\n");
-            printf("Session: %s \n", s_client->m_engine.GetSessionInfo(session));
+            printf("Session: %s \n", s_client->m_engine.GetSessionInfo(session).c_str());
             printf("%s \n", e.string);
         } break;
     default:
         printf("Unsupported event type '%u' sent to receive callback", eType);
-        printf("Session: %s \n", s_client->m_engine.GetSessionInfo(session));
+        printf("Session: %s \n", s_client->m_engine.GetSessionInfo(session).c_str());
         break;
     }
 }
