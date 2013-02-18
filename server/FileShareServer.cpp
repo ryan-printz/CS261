@@ -17,7 +17,7 @@ static FileShareServer * s_server = nullptr;
 
 // Callbacks
 //******************************************************************************
-void ReceiveEventCallback (HSession session, char * data) {
+void ReceiveEventCallback (HSession session, ubyte * data) {
     assert(data != nullptr);
 
     EventType eType = *reinterpret_cast<EventType*>(data);

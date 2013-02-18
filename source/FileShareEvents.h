@@ -25,7 +25,7 @@ struct BaseEvent {
 struct PrintStringEvent : BaseEvent {
     PrintStringEvent() : BaseEvent(PRINTSTRING_EVENT) {}
     unsigned stringSize;
-    char string [];
+    const char * string;
 
     static types def[];
 };

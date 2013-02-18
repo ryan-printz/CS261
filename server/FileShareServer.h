@@ -15,7 +15,7 @@
 class FileShareServer {
 friend void SessionAcceptedCallback (HSession);
 friend void SessionClosedCallback (HSession);
-friend void ReceiveEventCallback (HSession, char *);
+friend void ReceiveEventCallback (HSession, ubyte *);
 
 public:
     FileShareServer ();

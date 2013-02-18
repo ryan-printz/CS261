@@ -10,6 +10,7 @@
 
 
 #include <unordered_map>
+#include "Types.h"
 #include "Serialization.h"
 
 typedef struct DevSession {} * HSession;
@@ -21,7 +22,7 @@ class Engine {
 public:
     // Callback Types
     typedef void (*FSessionCallback) (HSession);
-    typedef void (*FEventReceivedCallback) (HSession session, char * data);
+    typedef void (*FEventReceivedCallback) (HSession session, ubyte * data);
 
     Engine (
         FSessionCallback sessionAccepted, 
@@ -46,7 +47,7 @@ public:
 
 private:
     void Listen ();
-    void Send(unsigned char * buffer, unsigned bufferLen, HSession session);
+    void Send(ubyte * buffer, unsigned bufferLen, HSession session);
 
     // No copy
     Engine (Engine&);

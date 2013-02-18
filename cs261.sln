@@ -8,6 +8,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Source", "Source", "{DC3695
 		source\DropConnectionDecorator.h = source\DropConnectionDecorator.h
 		source\Engine.cpp = source\Engine.cpp
 		source\Engine.h = source\Engine.h
+		source\FileShareEvents.cpp = source\FileShareEvents.cpp
 		source\FileShareEvents.h = source\FileShareEvents.h
 		source\IConnection.cpp = source\IConnection.cpp
 		source\IConnection.h = source\IConnection.h

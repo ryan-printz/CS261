@@ -19,7 +19,7 @@ struct fileInfo {
 class FileShareClient {
     friend void SessionAcceptedCallback (HSession);
     friend void SessionClosedCallback (HSession);
-    friend void ReceiveEventCallback (HSession, char *);
+    friend void ReceiveEventCallback (HSession, ubyte *);
 
 public:
     FileShareClient ();
@@ -28,6 +28,9 @@ public:
     bool Initialize ();
     bool ShutDown ();
     bool Update ();
+
+private:
+    void HandleInputCommand (const std::string & command);
 
 private:
     Engine m_engine;

@@ -9,6 +9,7 @@
 #pragma once
 
 // Exported functions
+
 bool CheckInput       (std::string & buffer);
 bool StartInputThread ();
 bool StopInputThread  ();
