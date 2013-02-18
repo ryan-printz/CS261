@@ -11,15 +11,15 @@
 int main (void) {
     FileShareClient client;
 
-    server.Initialize();
+    client.Initialize();
 
     bool quit = false;
 
     while (!quit) {
-        quit = server.Update();
+        quit = client.Update();
     }
 
-    server.ShutDown();
+    client.ShutDown();
 
     return 0;
 }

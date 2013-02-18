@@ -76,9 +76,30 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="..\source\ConnectionManager.hpp" />
+    <ClInclude Include="..\source\Engine.h" />
+    <ClInclude Include="..\source\IConnection.h" />
+    <ClInclude Include="..\source\IDecorator.h" />
+    <ClInclude Include="..\source\Listener.h" />
+    <ClInclude Include="..\source\ProtoConnection.h" />
+    <ClInclude Include="..\source\SequenceNumber.h" />
+    <ClInclude Include="..\source\Socket.h" />
+    <ClInclude Include="..\source\TCPConnection.h" />
+    <ClInclude Include="..\source\Timer.h" />
+    <ClInclude Include="..\source\Types.h" />
     <ClInclude Include="FileShareClient.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\source\ConnectionManager.cpp" />
+    <ClCompile Include="..\source\Engine.cpp" />
+    <ClCompile Include="..\source\IConnection.cpp" />
+    <ClCompile Include="..\source\InputThreading.cpp" />
+    <ClCompile Include="..\source\Listener.cpp" />
+    <ClCompile Include="..\source\ProtoConnection.cpp" />
+    <ClCompile Include="..\source\SequenceNumber.cpp" />
+    <ClCompile Include="..\source\Socket.cpp" />
+    <ClCompile Include="..\source\TCPConnection.cpp" />
+    <ClCompile Include="..\source\Timer.cpp" />
     <ClCompile Include="FileShareClient.cpp" />
     <ClCompile Include="main.cpp" />
   </ItemGroup>

@@ -8,9 +8,13 @@
 
 #pragma once
 
-#include <list>
+#include <string>
 #include "../source/Engine.h"
 #include "../source/Timer.h"
+
+struct fileInfo {
+    std::string filename;
+};
 
 class FileShareClient {
     friend void SessionAcceptedCallback (HSession);
@@ -29,4 +33,10 @@ private:
     Engine m_engine;
     Timer m_timer;
     bool m_quit;
+
+    // Session management
+    HSession m_tcpServer;
+
+    std::string m_storePath;
+    std::string m_sharePath;
 };
