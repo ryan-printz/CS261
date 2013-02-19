@@ -185,7 +185,9 @@ void FileShareClient::HandleInputCommand (const std::string & command) {
 		{
 			ListConnectionsEvent e;
 		
-			m_engine.Send(e, m_tcpServer);
+			ReceiveEventCallback(nullptr, (ubyte*)&e); 
+
+			//m_engine.Send(e, m_tcpServer);
 		}
 		else if(tokens[0] == "SHOWINFO")
 		{
