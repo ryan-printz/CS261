@@ -84,7 +84,7 @@ void ReceiveEventCallback (HSession session, ubyte * data) {
 			std::transform(decoratorType.begin(), decoratorType.end(), decoratorType.begin(), ::toupper);
 
 			if( decoratorType == "LATENCY" )
-				dcm->Decorate( session, new LatencyConnectionDecorator(100.0f) );
+				dcm->Decorate( session, new LatencyConnectionDecorator(2.0f) );
 
 			else if( decoratorType == "DROP" )
 				dcm->Decorate( session, new DropConnectionDecorator(20.0f) );

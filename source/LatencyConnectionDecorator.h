@@ -40,15 +40,21 @@ public:
 		if( packet.m_size > 0 )
 			m_packets.push_back( packet );
 
-		if( m_packets.front().m_time >= m_delay )
+
+		if( m_packets.size() )
 		{
-			memcpy( buffer, m_packets.front().m_packet, len );
-			int size = packet.m_size;
-			m_packets.pop_front();
-			return size;
+			if( m_packets.front().m_time >= m_delay )
+			{
+				memcpy( buffer, m_packets.front().m_packet, len );
+				int size = m_packets.front().m_size;
+				m_packets.pop_front();
+				return size;
+			}
+			else 
+				return -1;
 		}
-		else 
-			return -1;
+		else
+			return 0;
 	}
 
 	virtual std::string connectionInfo() const

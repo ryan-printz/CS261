@@ -66,11 +66,11 @@ public:
 				current += m_sizeArray[TYPE_UARRAYSIZE];
 				++i;
 
-				//char* test2 = new char[m_sizeArray[E.def[i]] * temp];
-				//memcpy(test2, buf, m_sizeArray[E.def[i]] * temp);
+				//*(ubyte**)current = new ubyte[m_sizeArray[E.def[i]] * temp];
+				//memcpy(*(ubyte**)current, buf, m_sizeArray[E.def[i]] * temp);
 
-				*(ubyte**)current = new ubyte[m_sizeArray[E.def[i]] * temp];
-				memcpy(*(ubyte**)current, buf, m_sizeArray[E.def[i]] * temp);
+				*(ubyte**)current = buf;
+
 				current += 4;
 				buf += m_sizeArray[E.def[i]] * temp;
 				break;
