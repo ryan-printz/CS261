@@ -81,6 +81,7 @@
     <ClInclude Include="..\source\DecoratorConnectionManager.h" />
     <ClInclude Include="..\source\Engine.h" />
     <ClInclude Include="..\source\FileFrame.h" />
+    <ClInclude Include="..\source\FileShareEvents.h" />
     <ClInclude Include="..\source\IConnection.h" />
     <ClInclude Include="..\source\IConnectionDecorator.h" />
     <ClInclude Include="..\source\Listener.h" />

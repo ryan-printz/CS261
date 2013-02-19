@@ -8,6 +8,11 @@
 
 #include <Windows.h>
 #include <fstream>
+#include <iostream>
+#include <string>
+#include <sstream>
+#include <algorithm>
+#include <iterator>
 #include <cassert>
 #include "FileShareClient.h"
 #include "../source/InputThreading.h"
@@ -143,9 +148,33 @@ bool FileShareClient::Update () {
 //******************************************************************************
 void FileShareClient::HandleInputCommand (const std::string & command) {
     // for now this just sends a print string, but we will change this to parse commands and switch
-    PrintStringEvent e;
-    e.stringSize = command.size() + 1;
-    e.string = command.c_str();
+    
+	std::vector<std::string> tokens;
 
-    m_engine.Send(e, m_tcpServer);
+	std::istringstream iss(command);
+
+	std::copy(std::istream_iterator<std::string>(iss),
+         std::istream_iterator<std::string>(),
+         std::back_inserter<std::vector<std::string> >(tokens));
+	
+	if(tokens[0] == "GETFILE")
+	{
+		GetFileEvent e;
+	}
+	else if(tokens[0] == "LISTCONNECTIONS")
+	{
+		ListConnectionsEvent e;
+	}
+	else if(tokens[0] == "SHOWINFO")
+	{
+		ShowInfoEvent e;
+	}
+	else
+	{
+		PrintStringEvent e;
+		e.stringSize = command.size() + 1;
+		e.string = command.c_str();
+
+		m_engine.Send(e, m_tcpServer);
+	}
 }
