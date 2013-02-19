@@ -1,45 +1,9 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 11.00
 # Visual Studio 2010
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Source", "Source", "{DC369597-3BD9-46B1-9A32-F36C1EE1BA02}"
-	ProjectSection(SolutionItems) = preProject
-		source\ConnectionManager.cpp = source\ConnectionManager.cpp
-		source\DropConnectionDecorator.h = source\DropConnectionDecorator.h
-		source\Engine.cpp = source\Engine.cpp
-		source\Engine.h = source\Engine.h
-		source\FileShareEvents.cpp = source\FileShareEvents.cpp
-		source\FileShareEvents.h = source\FileShareEvents.h
-		source\IConnection.cpp = source\IConnection.cpp
-		source\IConnection.h = source\IConnection.h
-		source\InputThreading.cpp = source\InputThreading.cpp
-		source\InputThreading.h = source\InputThreading.h
-		source\LatencyConnectionDecorator.h = source\LatencyConnectionDecorator.h
-		source\Listener.cpp = source\Listener.cpp
-		source\Listener.h = source\Listener.h
-		source\ProtoConnection.cpp = source\ProtoConnection.cpp
-		source\ProtoConnection.h = source\ProtoConnection.h
-		source\SequenceNumber.cpp = source\SequenceNumber.cpp
-		source\SequenceNumber.h = source\SequenceNumber.h
-		source\Serialization.cpp = source\Serialization.cpp
-		source\Serialization.h = source\Serialization.h
-		source\Socket.cpp = source\Socket.cpp
-		source\Socket.h = source\Socket.h
-		source\TCPConnection.cpp = source\TCPConnection.cpp
-		source\TCPConnection.h = source\TCPConnection.h
-		source\Timer.cpp = source\Timer.cpp
-		source\Timer.h = source\Timer.h
-		source\Types.h = source\Types.h
-		source\Utils.cpp = source\Utils.cpp
-		source\Utils.hpp = source\Utils.hpp
-	EndProjectSection
-EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "client", "client\client.vcxproj", "{E341B12D-29DC-4223-98ED-96AA8A3A16B3}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "server", "server\server.vcxproj", "{007DC164-6899-4133-A4E9-A1E3D6145968}"
-EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "test", "test\test.vcxproj", "{4CFF2BEF-B788-4A91-A4B4-F0AF874903D6}"
-EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "test client", "test client\test client.vcxproj", "{71EF45B0-7B24-4690-818B-6AFF1DDE5864}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "echo server", "echo server\echo server.vcxproj", "{F701FF51-16B2-49C7-852B-8ED868327526}"
 EndProject
@@ -57,14 +21,6 @@ Global
 		{007DC164-6899-4133-A4E9-A1E3D6145968}.Debug|Win32.Build.0 = Debug|Win32
 		{007DC164-6899-4133-A4E9-A1E3D6145968}.Release|Win32.ActiveCfg = Release|Win32
 		{007DC164-6899-4133-A4E9-A1E3D6145968}.Release|Win32.Build.0 = Release|Win32
-		{4CFF2BEF-B788-4A91-A4B4-F0AF874903D6}.Debug|Win32.ActiveCfg = Debug|Win32
-		{4CFF2BEF-B788-4A91-A4B4-F0AF874903D6}.Debug|Win32.Build.0 = Debug|Win32
-		{4CFF2BEF-B788-4A91-A4B4-F0AF874903D6}.Release|Win32.ActiveCfg = Release|Win32
-		{4CFF2BEF-B788-4A91-A4B4-F0AF874903D6}.Release|Win32.Build.0 = Release|Win32
-		{71EF45B0-7B24-4690-818B-6AFF1DDE5864}.Debug|Win32.ActiveCfg = Debug|Win32
-		{71EF45B0-7B24-4690-818B-6AFF1DDE5864}.Debug|Win32.Build.0 = Debug|Win32
-		{71EF45B0-7B24-4690-818B-6AFF1DDE5864}.Release|Win32.ActiveCfg = Release|Win32
-		{71EF45B0-7B24-4690-818B-6AFF1DDE5864}.Release|Win32.Build.0 = Release|Win32
 		{F701FF51-16B2-49C7-852B-8ED868327526}.Debug|Win32.ActiveCfg = Debug|Win32
 		{F701FF51-16B2-49C7-852B-8ED868327526}.Debug|Win32.Build.0 = Debug|Win32
 		{F701FF51-16B2-49C7-852B-8ED868327526}.Release|Win32.ActiveCfg = Release|Win32

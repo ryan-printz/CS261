@@ -51,7 +51,7 @@ void ReceiveEventCallback (HSession session, ubyte * data) {
 
 	case LISTCONNECTIONS_EVENT:
 		{
-			s_client->m_engine;
+			printf("%s", s_client->m_engine.GetConnectionsInfo()->GetAllSessionInfo().c_str());
 		} break;
 
     default:

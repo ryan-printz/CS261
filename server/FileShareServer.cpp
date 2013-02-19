@@ -13,6 +13,7 @@
 #include "ConnectionManager.h"
 #include <cassert>
 #include <fstream>
+#include <iostream>
 
 static FileShareServer * s_server = nullptr;
 
