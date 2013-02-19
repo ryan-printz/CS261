@@ -1,23 +1,33 @@
 #pragma once
 
-#include "IConnection.h"
-#include "IDecorator.h"
+#include "IConnectionDecorator.h"
 
-class DropConnectionDecorator : public IConnection, public IDecorator
+#include <sstream>
+
+class DropConnectionDecorator : public IConnectionDecorator
 {
 public:
-	DropConnectionDecorator(IConnection * modifiedConnection)
-		: m_decorated(modifiedConnection)
-	{};
+	DropConnectionDecorator(float droprate)
+	{
+		m_decorate = nullptr;
+		m_droprate = 1.0f / droprate;
+	};
 
-	virtual int send(ubyte * buffer, uint bufferlen) { return m_decorated->send(buffer, bufferlen); };
-	virtual int receive(ubyte * buffer, uint bufferlen) { return m_decorated->receive(buffer, bufferlen); };
+	virtual int receive(ubyte * buffer, uint len) 
+	{
+		if( (std::rand() % 100 * m_droprate) > 1.0f )
+			return -1;
+
+		return m_decorate->receive(buffer, len);
+	}
 
 	virtual std::string connectionInfo() const
 	{
-		return "Modified " + m_decorated->connectionInfo() + " (% of packets dropped.)";
+		std::stringstream info;
+		info << "Modified " << m_decorate->connectionInfo() << " (" << 1.0f / m_droprate << "% of packets dropped.)";
+		return info.str();
 	};
 
-private:
-	IConnection * m_decorated;
+protected:
+	float m_droprate;
 };

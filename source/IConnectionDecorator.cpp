@@ -46,7 +46,7 @@ bool IConnectionDecorator::disconnect()
 	return m_decorate->disconnect();
 }
 
-bool IConnectionDecorator::connected()
+bool IConnectionDecorator::connected() const
 {
 	return m_decorate->connected();
 }

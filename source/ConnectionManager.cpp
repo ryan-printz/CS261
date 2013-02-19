@@ -27,13 +27,26 @@ unsigned ConnectionManager::Count() const
 	return m_connections.size();
 }
 
+HSession ConnectionManager::GetHandleByIndex(uint sessionNumber) const
+{
+	auto connection = m_connections.begin();
+
+	while( --sessionNumber > 0 )
+		++connection;
+
+	if( connection == m_connections.end() )
+		return nullptr;
+	else
+		return connection->first;
+}
+
 std::string ConnectionManager::GetAllSessionInfo() const
 {
 	std::stringstream info;
 
 	info << "Current Sessions: " << Count() << std::endl << "--------------------------------------------------" << std::endl;
 
-	int i = 0;
+	int i = 1;
 	for(auto connection = m_connections.begin(); connection != m_connections.end(); ++connection)
 		info << i++ << ": " << connection->second->connected() << std::endl;
 
@@ -42,13 +55,12 @@ std::string ConnectionManager::GetAllSessionInfo() const
 
 //******************************************************************************
 std::string ConnectionManager::GetSessionInfo (HSession session) const {
-    if (!IsHandleValid(session)) {
-        return std::string("Invalid Session");
-    }
+	auto connection = m_connections.find(session);
 
-    IConnection * connection = (IConnection*)session;
+	if( connection == m_connections.end() )
+		return "Invalid Session.";
 
-    return connection->connectionInfo();
+	return connection->second->connectionInfo();
 }
 
 //******************************************************************************

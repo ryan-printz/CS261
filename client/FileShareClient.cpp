@@ -10,12 +10,15 @@
 #include <fstream>
 #include <iostream>
 #include <string>
+#include <cstring>
 #include <sstream>
 #include <algorithm>
 #include <iterator>
 #include <cassert>
 #include "FileShareClient.h"
-#include "ConnectionManager.h"
+#include "DecoratorConnectionManager.h"
+#include "LatencyConnectionDecorator.h"
+#include "DropConnectionDecorator.h"
 #include "../source/InputThreading.h"
 #include "../source/FileShareEvents.h"
 
@@ -51,7 +54,40 @@ void ReceiveEventCallback (HSession session, ubyte * data) {
 
 	case LISTCONNECTIONS_EVENT:
 		{
-			printf("%s", s_client->m_engine.GetConnectionsInfo()->GetAllSessionInfo().c_str());
+			printf("%s\n", s_client->m_engine.GetConnectionsInfo()->GetAllSessionInfo().c_str());
+		} break;
+
+	case SHOWINFO_EVENT:
+		{
+			ShowInfoEvent * se = (ShowInfoEvent*)(data);
+			HSession session = s_client->m_engine.GetConnectionsInfo()->GetHandleByIndex(se->connectionID);
+			printf("%s\n", s_client->m_engine.GetConnectionsInfo()->GetSessionInfo(session).c_str());
+		} break;
+
+	case DECORATECONNECTION_EVENT:
+		{
+			DecorateConnectionEvent * de = (DecorateConnectionEvent*)(data);
+			session = s_client->m_engine.GetConnectionsInfo()->GetHandleByIndex(de->connectionID);
+
+			if(!session)
+				break;
+
+			DecoratorConnectionManager * dcm = (DecoratorConnectionManager*)s_client->m_engine.GetConnectionsInfo();
+			if( !de->decoratorType )
+			{
+				dcm->Undecorate(session);
+				break;
+			}
+			
+			std::string decoratorType(de->decoratorType);
+			std::transform(decoratorType.begin(), decoratorType.end(), decoratorType.begin(), ::toupper);
+
+			if( decoratorType == "LATENCY" )
+				dcm->Decorate( session, new LatencyConnectionDecorator(100.0f) );
+
+			else if( decoratorType == "DROP" )
+				dcm->Decorate( session, new DropConnectionDecorator(20.0f) );
+
 		} break;
 
     default:
@@ -117,7 +153,7 @@ bool FileShareClient::Initialize () {
 
     // connect to tcp server
     if (success) {
-        m_tcpServer = m_engine.ConnectUdp(serverAddress, atoi(serverPort));
+		m_tcpServer = m_engine.ConnectTcp(serverAddress, atoi(serverPort));
 
         if (m_tcpServer == nullptr)
             success = false;
@@ -200,7 +236,26 @@ void FileShareClient::HandleInputCommand (const std::string & command) {
 				ShowInfoEvent e;
 				e.connectionID = std::stoi(tokens[1]);
 
-				m_engine.Send(e, m_tcpServer);
+				ReceiveEventCallback(nullptr, (ubyte*)&e);
+			}
+		}
+		else if(tokens[0] == "DECORATE")
+		{
+			if(tokens.size() < 2)
+			{
+				printf("Please use the format DECORATE <connectionID> [DROP|LATENCY]\n");
+			}
+			else
+			{
+				DecorateConnectionEvent e;
+				e.connectionID = std::stoi(tokens[1]);
+
+				if(tokens.size() < 3)
+					e.decoratorType = nullptr;
+				else
+					e.decoratorType = tokens[2].c_str();
+
+				ReceiveEventCallback(nullptr, (ubyte*)&e);
 			}
 		}
 		else

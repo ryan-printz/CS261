@@ -15,7 +15,8 @@ enum EventType {
     PRINTSTRING_EVENT,
 	GETFILE_EVENT,
 	LISTCONNECTIONS_EVENT,
-	SHOWINFO_EVENT
+	SHOWINFO_EVENT,
+	DECORATECONNECTION_EVENT
 };
 
 struct BaseEvent {
@@ -55,3 +56,10 @@ struct ShowInfoEvent : BaseEvent
 	static types def[];
 };
 
+struct DecorateConnectionEvent : BaseEvent
+{
+	DecorateConnectionEvent() : BaseEvent(DECORATECONNECTION_EVENT) {};
+	unsigned connectionID;
+	const char * decoratorType;
+	static types def[];
+};

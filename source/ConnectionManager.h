@@ -18,6 +18,7 @@ class IConnection;
 class IConnectionInfo
 {
 public:
+	virtual HSession GetHandleByIndex(unsigned int) const = 0;
 	virtual unsigned Count() const = 0;
 	virtual std::string GetSessionInfo(HSession session) const = 0;
 	virtual std::string GetAllSessionInfo() const = 0;
@@ -38,9 +39,10 @@ public:
 
     bool IsHandleValid (HSession session) const;
 
-	virtual unsigned Count() const;
-	virtual std::string GetAllSessionInfo() const;
-    std::string GetSessionInfo (HSession session) const;
+	HSession GetHandleByIndex(unsigned int) const;
+	unsigned Count() const;
+	std::string GetAllSessionInfo() const;
+    std::string GetSessionInfo(HSession session) const;
 
     void ClearDeleteList ();
 

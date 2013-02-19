@@ -109,6 +109,13 @@
     <ClInclude Include="..\source\ConnectionManager.h">
       <Filter>headers</Filter>
     </ClInclude>
+    <ClInclude Include="..\source\FileShareEvents.h" />
+    <ClInclude Include="..\source\DropConnectionDecorator.h">
+      <Filter>headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\LatencyConnectionDecorator.h">
+      <Filter>headers</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="headers">

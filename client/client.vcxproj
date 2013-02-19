@@ -81,11 +81,13 @@
     <ClInclude Include="..\source\Chunk.h" />
     <ClInclude Include="..\source\ConnectionManager.h" />
     <ClInclude Include="..\source\DecoratorConnectionManager.h" />
+    <ClInclude Include="..\source\DropConnectionDecorator.h" />
     <ClInclude Include="..\source\Engine.h" />
     <ClInclude Include="..\source\FileFrame.h" />
     <ClInclude Include="..\source\FileShareEvents.h" />
     <ClInclude Include="..\source\IConnection.h" />
     <ClInclude Include="..\source\IConnectionDecorator.h" />
+    <ClInclude Include="..\source\LatencyConnectionDecorator.h" />
     <ClInclude Include="..\source\Listener.h" />
     <ClInclude Include="..\source\ProtoConnection.h" />
     <ClInclude Include="..\source\SequenceNumber.h" />

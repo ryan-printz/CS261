@@ -36,3 +36,10 @@ types ShowInfoEvent::def[] = {
 	TYPE_UNSIGNED,
     TYPE_END
 };
+
+types DecorateConnectionEvent::def[] = {
+	TYPE_UNSIGNED,
+	TYPE_UNSIGNED,
+	TYPE_UARRAYSIZE, TYPE_CHAR,
+	TYPE_END
+};
