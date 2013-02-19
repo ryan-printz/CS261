@@ -54,3 +54,11 @@ types RequestFileListEvent::def[] = {
     TYPE_UNSIGNED,
     TYPE_END
 };
+
+types StartTransferEvent::def[] = {
+	TYPE_UNSIGNED,
+	TYPE_UARRAYSIZE, TYPE_CHAR,
+	TYPE_UARRAYSIZE, TYPE_CHAR,
+	TYPE_UNSIGNED,
+	TYPE_END
+};

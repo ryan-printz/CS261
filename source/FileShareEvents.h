@@ -18,7 +18,8 @@ enum EventType {
 	SHOWINFO_EVENT,
 	DECORATECONNECTION_EVENT,
     FILESHARE_EVENT,
-    REQUESTFILELIST_EVENT
+    REQUESTFILELIST_EVENT,
+	STARTTRANSFER_EVENT
 };
 
 struct BaseEvent {
@@ -78,4 +79,15 @@ struct RequestFileListEvent : BaseEvent
 {
     RequestFileListEvent() : BaseEvent(REQUESTFILELIST_EVENT) {};
     static types def[];
+};
+
+struct StartTransferEvent : BaseEvent
+{
+	StartTransferEvent() : BaseEvent(STARTTRANSFER_EVENT) {}
+	unsigned fileSize;
+	const char * file;
+	unsigned ipSize;
+	const char * hostIp;
+	unsigned hostPort;
+	static types def[];
 };

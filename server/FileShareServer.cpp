@@ -11,6 +11,7 @@
 #include "../source/Serialization.h"
 #include "../source/FileShareEvents.h"
 #include "ConnectionManager.h"
+#include "../source/Utils.hpp"
 #include <cassert>
 #include <fstream>
 #include <iostream>
@@ -48,6 +49,14 @@ void ReceiveEventCallback (HSession session, ubyte * data) {
         {
             s_server->SendFileList(session);
         } break;
+
+	case GETFILE_EVENT:
+		{
+			GetFileEvent e;
+			Packer p;
+			p.unpack(e, data);
+			s_server->HandleFileRequest(e, session);
+		}
     default:
         printf("Unsupported event type '%u' sent to receive callback", eType);
 		printf("Session: %s \n", s_server->m_engine.GetConnectionsInfo()->GetSessionInfo(session).c_str());
@@ -146,8 +155,20 @@ void FileShareServer::SendFileList (HSession session) {
         //if (sessionItr->first == session)
             //continue;
 
+		char sessionIdBuff[256];
+		itoa((int)session, sessionIdBuff, 10);
+
+		std::string sessionIdString;
+		sessionIdString.append("SessionId: ");
+		sessionIdString.append(sessionIdBuff);
+		PrintStringEvent sessionId;
+		sessionId.string = sessionIdString.c_str();
+		sessionId.stringSize = sessionIdString.size() + 1;
+		m_engine.Send(sessionId, session);
+
         auto fileArray = sessionItr->second;
         auto fileItr = fileArray.begin();
+		++fileItr; // first element is user's ip & udp listen port.
         for (; fileItr != fileArray.end(); ++fileItr) {
             e.string = fileItr->c_str();
             e.stringSize = fileItr->size() + 1;
@@ -158,4 +179,46 @@ void FileShareServer::SendFileList (HSession session) {
 	e.string = "*******File list end*******\n";
     e.stringSize = strlen(e.string) + 1;
     m_engine.Send(e, session);
+}
+
+//******************************************************************************
+void FileShareServer::HandleFileRequest(const GetFileEvent & e, HSession session) {
+	auto sessionItr = m_sessionList.find((HSession)e.from);
+
+	if (sessionItr == m_sessionList.end()) {
+		PrintStringEvent e;
+		e.string = "The client specified does not exist.";
+		e.stringSize = strlen(e.string) + 1;
+		m_engine.Send(e, session);
+		return;
+	}
+
+	auto fileItr = sessionItr->second.begin();
+
+	bool found = false;
+	for (; fileItr != sessionItr->second.end(); ++fileItr) {
+		if (!strcmp(fileItr->c_str(), e.file)) {
+			found = true;
+			break;
+		}
+	}
+
+	if (!found) {
+		PrintStringEvent e;
+		e.string = "The file you requested does not exist.";
+		e.stringSize = strlen(e.string) + 1;
+		m_engine.Send(e, session);
+		return;
+	}
+
+	std::string hostInfo = sessionItr->second[0];
+
+	StartTransferEvent eT;
+	eT.file = e.file;
+	eT.fileSize = e.fileSize;
+	std::string tempIp = getword(hostInfo);
+	eT.hostIp = tempIp.c_str();
+	eT.ipSize = strlen(eT.hostIp) + 1;
+	eT.hostPort = atoi(getword(hostInfo).c_str());
+	m_engine.Send(e, session);
 }
