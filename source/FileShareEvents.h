@@ -13,6 +13,9 @@
 enum EventType {
     BASE_EVENT,
     PRINTSTRING_EVENT,
+	GETFILE_EVENT,
+	LISTCONNECTIONS_EVENT,
+	SHOWINFO_EVENT
 };
 
 struct BaseEvent {
@@ -28,5 +31,28 @@ struct PrintStringEvent : BaseEvent {
     const char * string;
 
     static types def[];
+};
+
+struct GetFileEvent : BaseEvent 
+{
+	GetFileEvent() : BaseEvent(GETFILE_EVENT) {};
+	unsigned fileSize;
+	const char * file;
+	unsigned fromSize;
+	const char * from;
+	static types def[];
+};
+
+struct ListConnectionsEvent : BaseEvent 
+{
+	ListConnectionsEvent() : BaseEvent(LISTCONNECTIONS_EVENT) {};
+	static types def[];
+};
+
+struct ShowInfoEvent : BaseEvent 
+{
+	ShowInfoEvent() : BaseEvent(SHOWINFO_EVENT) {};
+	unsigned connectionID;
+	static types def[];
 };
 

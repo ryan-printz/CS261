@@ -15,7 +15,24 @@ types BaseEvent::def[] = {
 
 types PrintStringEvent::def[] = {
     TYPE_UNSIGNED,
-    TYPE_UARRAYSIZE,
-    TYPE_CHAR,
+    TYPE_UARRAYSIZE, TYPE_CHAR,
+    TYPE_END
+};
+
+types GetFileEvent::def[] = {
+    TYPE_UNSIGNED, 
+    TYPE_UARRAYSIZE, TYPE_CHAR,
+    TYPE_UARRAYSIZE, TYPE_CHAR,
+    TYPE_END
+};
+
+types ListConnectionsEvent::def[] = {
+    TYPE_UNSIGNED, 
+    TYPE_END
+};
+
+types ShowInfoEvent::def[] = {
+    TYPE_UNSIGNED, 
+	TYPE_UNSIGNED,
     TYPE_END
 };
