@@ -42,15 +42,12 @@ public:
     HSession ConnectTcp (char * remoteIp, unsigned remotePort);
     bool ToggleListenTcp (unsigned port);
 
-<<<<<<< HEAD
-=======
     HSession ConnectUdp (char * remoteIp, unsigned remotePort);
     bool ToggleListenUdp (unsigned port);
 
     // single session specifics
     std::string GetSessionInfo (HSession session) const;
 
->>>>>>> Tried to change server & client to use protoconn
     template <typename T>
     void Send (T & event, HSession session);
 
