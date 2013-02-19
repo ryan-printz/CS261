@@ -78,9 +78,11 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\source\ConnectionManager.cpp" />
+    <ClCompile Include="..\source\DecoratorConnectionManager.cpp" />
     <ClCompile Include="..\source\Engine.cpp" />
     <ClCompile Include="..\source\FileShareEvents.cpp" />
     <ClCompile Include="..\source\IConnection.cpp" />
+    <ClCompile Include="..\source\IConnectionDecorator.cpp" />
     <ClCompile Include="..\source\InputThreading.cpp" />
     <ClCompile Include="..\source\Listener.cpp" />
     <ClCompile Include="..\source\ProtoConnection.cpp" />

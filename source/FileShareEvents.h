@@ -38,8 +38,7 @@ struct GetFileEvent : BaseEvent
 	GetFileEvent() : BaseEvent(GETFILE_EVENT) {};
 	unsigned fileSize;
 	const char * file;
-	unsigned fromSize;
-	const char * from;
+	unsigned from;
 	static types def[];
 };
 

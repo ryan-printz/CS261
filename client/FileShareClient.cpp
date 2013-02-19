@@ -156,25 +156,51 @@ void FileShareClient::HandleInputCommand (const std::string & command) {
 	std::copy(std::istream_iterator<std::string>(iss),
          std::istream_iterator<std::string>(),
          std::back_inserter<std::vector<std::string> >(tokens));
-	
-	if(tokens[0] == "GETFILE")
+	if(tokens.size())
 	{
-		GetFileEvent e;
-	}
-	else if(tokens[0] == "LISTCONNECTIONS")
-	{
-		ListConnectionsEvent e;
-	}
-	else if(tokens[0] == "SHOWINFO")
-	{
-		ShowInfoEvent e;
-	}
-	else
-	{
-		PrintStringEvent e;
-		e.stringSize = command.size() + 1;
-		e.string = command.c_str();
+		if(tokens[0] == "GETFILE")
+		{
+			if(tokens.size() < 3)
+			{
+				printf("Please use the format GETFILE <filename> <connectionID>\n");
+			}
+			else
+			{
+				GetFileEvent e;
+				e.file = tokens[1].c_str();
+				e.fileSize = tokens[1].size() + 1;
+				e.from = std::stoi(tokens[2]);
 
-		m_engine.Send(e, m_tcpServer);
+				m_engine.Send(e, m_tcpServer);
+			}
+		}
+		else if(tokens[0] == "LISTCONNECTIONS")
+		{
+			ListConnectionsEvent e;
+		
+			m_engine.Send(e, m_tcpServer);
+		}
+		else if(tokens[0] == "SHOWINFO")
+		{
+			if(tokens.size() < 2)
+			{
+				printf("Please use the format SHOWINFO <connectionID>\n");
+			}
+			else
+			{
+				ShowInfoEvent e;
+				e.connectionID = std::stoi(tokens[1]);
+
+				m_engine.Send(e, m_tcpServer);
+			}
+		}
+		else
+		{
+			PrintStringEvent e;
+			e.stringSize = command.size() + 1;
+			e.string = command.c_str();
+
+			m_engine.Send(e, m_tcpServer);
+		}
 	}
 }

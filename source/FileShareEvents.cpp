@@ -22,7 +22,7 @@ types PrintStringEvent::def[] = {
 types GetFileEvent::def[] = {
     TYPE_UNSIGNED, 
     TYPE_UARRAYSIZE, TYPE_CHAR,
-    TYPE_UARRAYSIZE, TYPE_CHAR,
+    TYPE_UNSIGNED,
     TYPE_END
 };
 
