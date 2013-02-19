@@ -21,6 +21,7 @@
 #include "DropConnectionDecorator.h"
 #include "../source/InputThreading.h"
 #include "../source/FileShareEvents.h"
+#include "../source/Utils.hpp"
 
 FileShareClient * s_client = nullptr;
 
@@ -114,9 +115,8 @@ FileShareClient::~FileShareClient () {
 
 //******************************************************************************
 bool FileShareClient::Initialize () {
-    bool success;
-
-    success = m_engine.Initialize();
+    if (!m_engine.Initialize())
+        return false;
 
     // read config file
     // for server tcp info
@@ -152,20 +152,27 @@ bool FileShareClient::Initialize () {
     stream.close();
 
     // connect to tcp server
-    if (success) {
-		m_tcpServer = m_engine.ConnectTcp(serverAddress, atoi(serverPort));
+    if (!(m_tcpServer = m_engine.ConnectTcp(serverAddress, atoi(serverPort))))
+        return false;
 
-        if (m_tcpServer == nullptr)
-            success = false;
+    // send list of shared files
+    std::string fileList = getFilenameList(m_sharePath.c_str());
+
+    while (fileList.size() > 0) {
+        std::string fileName = getword(fileList);
+        FileShareEvent e;
+        e.filename = fileName.c_str();
+        e.nameLength = fileName.size() + 1;
+        m_engine.Send(e, m_tcpServer);
     }
 
-    // start listening on udp
-    //m_engine.ToggleListenUdp(atoi(udpListenPort));
+    if (!m_engine.ToggleListenUdp(atoi(udpListenPort)))
+        return false;
 
-    if (success)
-        success = StartInputThread();
+    if (!StartInputThread())
+        return false;
 
-    return success;
+    return true;
 }
 
 //******************************************************************************

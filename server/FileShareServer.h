@@ -8,7 +8,9 @@
 
 #pragma once
 
-#include <list>
+#include <unordered_map>
+#include <vector>
+#include "../source/FileShareEvents.h"
 #include "../source/Engine.h"
 #include "../source/Timer.h"
 
@@ -26,9 +28,13 @@ public:
     bool Update ();
 
 private:
+    void AddFileToShare (const FileShareEvent & e, HSession session);
+private:
     Engine m_engine;
     Timer m_timer;
-    std::list<HSession> m_sessionList;
+
+    // session, vector of available files
+    std::unordered_map<HSession, std::vector<std::string> > m_sessionList;
 
     bool m_quit;
 };

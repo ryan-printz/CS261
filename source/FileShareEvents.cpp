@@ -43,3 +43,9 @@ types DecorateConnectionEvent::def[] = {
 	TYPE_UARRAYSIZE, TYPE_CHAR,
 	TYPE_END
 };
+
+types FileShareEvent::def[] = {
+    TYPE_UNSIGNED,
+    TYPE_UARRAYSIZE, TYPE_CHAR,
+    TYPE_END
+};

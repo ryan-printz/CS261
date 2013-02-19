@@ -37,6 +37,15 @@ void ReceiveEventCallback (HSession session, ubyte * data) {
             // echo to test receive on client side
             s_server->m_engine.Send(e, session);
         } break;
+
+    case FILESHARE_EVENT:
+        {
+            FileShareEvent e;
+            Packer p;
+            p.unpack(e, data);
+            s_server->AddFileToShare(e, session);
+        } break;
+
     default:
         printf("Unsupported event type '%u' sent to receive callback", eType);
 		printf("Session: %s \n", s_server->m_engine.GetConnectionsInfo()->GetSessionInfo(session).c_str());
@@ -49,7 +58,7 @@ void SessionAcceptedCallback (HSession session) {
     assert(session != nullptr);
     assert(s_server != nullptr);
 
-    s_server->m_sessionList.push_back(session);
+    s_server->m_sessionList[session].clear();
 }
 
 //******************************************************************************
@@ -57,7 +66,10 @@ void SessionClosedCallback (HSession session) {
     assert(session != nullptr);
     assert(s_server != nullptr);
 
-    s_server->m_sessionList.remove(session);
+    auto delItr = s_server->m_sessionList.find(session);
+
+    if (delItr != s_server->m_sessionList.end())
+        s_server->m_sessionList.erase(delItr);
 }
 
 //******************************************************************************
@@ -109,4 +121,11 @@ bool FileShareServer::ShutDown () {
 bool FileShareServer::Update () {
     m_engine.Update(m_timer.Update());
     return m_quit;
+}
+
+//******************************************************************************
+void FileShareServer::AddFileToShare (const FileShareEvent & e, HSession session) {
+    auto sessionItr = m_sessionList.find(session);
+        
+    m_sessionList[session].push_back(e.filename);
 }
