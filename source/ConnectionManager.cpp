@@ -107,12 +107,21 @@ int ConnectionManager::Receive (unsigned char * buffer, unsigned bufferLen, HSes
     for (; connectionItr != m_connections.end(); ++connectionItr) {
 		result = connectionItr->second->receive(buffer, bufferLen);
 
-        if (result != 0)
+        if (result != 0 && result != -1)
 			sessionOut = connectionItr->first;
             break;
     }
 
     return result;
+}
+//******************************************************************************
+void ConnectionManager::Update (float dt) {
+    auto connectionItr = m_connections.begin();
+
+    for (; connectionItr != m_connections.end(); ++connectionItr) {
+        connectionItr->second->update(dt);
+    }
+
 }
 
 //******************************************************************************

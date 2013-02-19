@@ -37,7 +37,7 @@ Listener::~Listener () {
     }
 
     if (m_connection) {
-        // should close down connection here, no interface method for it yet
+        m_connection->cleanup();
         delete m_connection;
     }
 }
@@ -61,7 +61,11 @@ IConnection * Listener::Listen () {
         }
         break;
     case LISTEN_UDP:
-        //bool success = reinterpret_cast<ProtoConnection *>(m_connection)->connect(m_socket, Socket::localIP(), someFuckingPort);
+        bool success = reinterpret_cast<ProtoConnection *>(m_connection)->accept(m_socket);
+        if (success) {
+            newConnection = m_connection;
+            m_connection = new ProtoConnection;
+        }
         break;
     }
 
@@ -106,4 +110,6 @@ void Listener::InitializeUdp (unsigned port) {
     }
 
     m_socket->initializeUDP(Socket::localIP(), port);
+    m_socket->bind();
+    m_socket->setBlocking(false);
 }

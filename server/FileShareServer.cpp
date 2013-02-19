@@ -94,7 +94,7 @@ bool FileShareServer::Initialize () {
     bool success = m_engine.Initialize();
 
     if (success)
-        success = m_engine.ToggleListenTcp(listenPort);
+        success = m_engine.ToggleListenUdp(listenPort);
 
     return success;
 }

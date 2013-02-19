@@ -117,7 +117,7 @@ bool FileShareClient::Initialize () {
 
     // connect to tcp server
     if (success) {
-        m_tcpServer = m_engine.ConnectTcp(serverAddress, atoi(serverPort));
+        m_tcpServer = m_engine.ConnectUdp(serverAddress, atoi(serverPort));
 
         if (m_tcpServer == nullptr)
             success = false;

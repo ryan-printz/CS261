@@ -11,6 +11,7 @@
 #include "Listener.h"
 #include "DecoratorConnectionManager.h"
 #include "TCPConnection.h"
+#include "ProtoConnection.h"
 #include "Socket.h"
 
 //******************************************************************************
@@ -77,6 +78,28 @@ HSession Engine::ConnectTcp (char * remoteIp, unsigned remotePort) {
 }
 
 //******************************************************************************
+HSession Engine::ConnectUdp (char * remoteIp, unsigned remotePort) {
+    ProtoConnection * newConnection = new ProtoConnection;
+
+    if (!newConnection) {
+        return HSession(nullptr);
+    }
+
+    bool success = newConnection->connect(remoteIp, remotePort);
+
+    if (!success) {
+        delete newConnection;
+        return HSession(nullptr);
+    }
+
+    m_connectionManager->Add(reinterpret_cast<IConnection*>(newConnection));
+
+    HSession newHandle = (HSession)newConnection;
+
+    return newHandle;
+}
+
+//******************************************************************************
 bool Engine::ToggleListenTcp (unsigned port) {
     auto listItr = m_listenList.find(port);
 
@@ -104,9 +127,35 @@ const IConnectionInfo * Engine::GetConnectionsInfo() const
 }
 
 //******************************************************************************
+bool Engine::ToggleListenUdp (unsigned port) {
+    auto listItr = m_listenList.find(port);
+
+    if (listItr != m_listenList.end()) {
+        if (listItr->second->Type() == LISTEN_UDP) {
+            m_listenList.erase(listItr);
+            return false;
+        }
+    }
+
+    Listener * newListener = new Listener(LISTEN_UDP, port);
+
+    if (!newListener) {
+        return false;
+    }
+
+    m_listenList[port] = newListener;
+
+    return true;
+}
+
+//******************************************************************************
 void Engine::Update (float dt) {
     // Listen & Accept new connections
     Listen();
+
+    // Update connections
+    m_connectionManager->Update(dt);
+
 
     // Receive events
     const unsigned bufferLen = 512;
