@@ -8,6 +8,8 @@ class Socket;
 class IConnection
 {
 public:
+	virtual ~IConnection() {};
+
 	// connection setup/teardown
 	// accept requires a fully initialized "listening" socket.
 	virtual bool accept(Socket * open) = 0;

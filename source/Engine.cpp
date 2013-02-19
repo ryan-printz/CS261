@@ -9,7 +9,7 @@
 #include <cassert>
 #include "Engine.h"
 #include "Listener.h"
-#include "ConnectionManager.hpp"
+#include "DecoratorConnectionManager.h"
 #include "TCPConnection.h"
 #include "Socket.h"
 
@@ -22,7 +22,7 @@ Engine::Engine (
         : f_newSession(sessionAccepted)
         , f_closeSession(sessionClosed)
         , f_receiveEvent(receiveEvent) {
-    m_connectionManager = new ConnectionManager;
+    m_connectionManager = new DecoratorConnectionManager;
 }
 
 //******************************************************************************

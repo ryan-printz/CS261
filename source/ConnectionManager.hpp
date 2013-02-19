@@ -8,7 +8,7 @@
 
 #pragma once
 
-#include <list>
+#include <unordered_map>
 #include <set>
 
 struct DevSession;
@@ -18,7 +18,7 @@ class IConnection;
 class ConnectionManager {
 public:
     ConnectionManager  () {}
-    ~ConnectionManager ();
+    virtual ~ConnectionManager ();
     
     void Add       (IConnection * connection);
     void Remove    (IConnection * connection);
@@ -32,7 +32,7 @@ public:
     std::string GetSessionInfo (HSession session) const;
     void ClearDeleteList ();
 
-private:
-    std::list<IConnection *> m_connections;
+protected:
+    std::unordered_map<HSession, IConnection *> m_connections;
     std::set<IConnection *> m_deleteList;
 };

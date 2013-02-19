@@ -16,6 +16,7 @@
 
 //******************************************************************************
 ConnectionManager::~ConnectionManager () {
+
     ClearDeleteList();
 }
 
@@ -34,7 +35,7 @@ std::string ConnectionManager::GetSessionInfo (HSession session) const {
 void ConnectionManager::Add (IConnection * connection) {
     assert(connection != nullptr);
 
-    m_connections.push_back(connection);
+    m_connections.emplace(std::make_pair((HSession)connection, connection));
 }
 
 //******************************************************************************
@@ -48,10 +49,15 @@ void ConnectionManager::Remove (IConnection * connection) {
 void ConnectionManager::ClearDeleteList () {
     auto delItr = m_deleteList.begin();
 
-    for (; delItr != m_deleteList.end(); ++delItr) {
-        //(*delItr)->close();
-        delete *delItr;
-        m_connections.remove(*delItr);
+    for (; delItr != m_deleteList.end(); ++delItr) 
+	{
+		auto connection = m_connections.find((HSession)*delItr);
+
+		if( connection == m_connections.end() )
+			continue;
+
+		delete connection->second;
+		m_connections.erase(connection);
     }
 
     m_deleteList.clear();
@@ -59,27 +65,17 @@ void ConnectionManager::ClearDeleteList () {
 
 //******************************************************************************
 bool ConnectionManager::IsHandleValid (HSession session) const {
-    auto connectionItr = m_connections.begin();
-
-    IConnection * connection = (IConnection*)session;
-
-    for (; connectionItr != m_connections.end(); ++connectionItr) {
-        if (*connectionItr == connection)
-            return true;
-    }
-
-    return false;
+	return m_connections.find(session) != m_connections.end();
 }
 
 //******************************************************************************
 void ConnectionManager::Send (unsigned char * buffer, unsigned bufferLen, HSession session) {
-    if (!IsHandleValid(session)) {
-        return;
-    }
+	auto connection = m_connections.find(session);
 
-    IConnection * connection = (IConnection*)session;
+	if( connection == m_connections.end() )
+		return;
 
-    connection->send(buffer, bufferLen);
+	connection->second->send(buffer, bufferLen);
 }
 
 //******************************************************************************
@@ -89,10 +85,10 @@ int ConnectionManager::Receive (unsigned char * buffer, unsigned bufferLen, HSes
     sessionOut = nullptr;
 
     for (; connectionItr != m_connections.end(); ++connectionItr) {
-        result = (*connectionItr)->receive(buffer, bufferLen);
+		result = connectionItr->second->receive(buffer, bufferLen);
 
         if (result != 0)
-            sessionOut = (HSession)(*connectionItr);
+			sessionOut = connectionItr->first;
             break;
     }
 
@@ -104,6 +100,6 @@ void ConnectionManager::Broadcast (unsigned char * buffer, unsigned bufferLen) {
     auto connectionItr = m_connections.begin();
 
     for (; connectionItr != m_connections.end(); ++connectionItr) {
-        (*connectionItr)->send(buffer, bufferLen);
+		connectionItr->second->send(buffer, bufferLen);
     }
 }

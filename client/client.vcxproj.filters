@@ -1,0 +1,121 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="..\source\Chunk.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\ConnectionManager.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\Engine.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\FileFrame.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="FileShareClient.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\FileShareEvents.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\IConnection.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\InputThreading.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\Listener.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\ProtoConnection.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\SequenceNumber.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\Serialization.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\Socket.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\TCPConnection.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\Timer.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\Utils.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="main.cpp" />
+    <ClCompile Include="..\source\IConnectionDecorator.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\DecoratorConnectionManager.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\source\Chunk.h">
+      <Filter>headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\ConnectionManager.hpp">
+      <Filter>headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\Engine.h">
+      <Filter>headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\FileFrame.h">
+      <Filter>headers</Filter>
+    </ClInclude>
+    <ClInclude Include="FileShareClient.h">
+      <Filter>headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\IConnection.h">
+      <Filter>headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\Listener.h">
+      <Filter>headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\ProtoConnection.h">
+      <Filter>headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\SequenceNumber.h">
+      <Filter>headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\Serialization.h">
+      <Filter>headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\Socket.h">
+      <Filter>headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\Timer.h">
+      <Filter>headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\Types.h">
+      <Filter>headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\TCPConnection.h">
+      <Filter>headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\Utils.hpp">
+      <Filter>source</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\DecoratorConnectionManager.h">
+      <Filter>headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\IConnectionDecorator.h">
+      <Filter>headers</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="headers">
+      <UniqueIdentifier>{e2f5e079-1a06-4ddb-a00c-475643b860e4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="source">
+      <UniqueIdentifier>{2b222705-f2db-448e-9e5b-fb25272d5a37}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

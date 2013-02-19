@@ -78,10 +78,11 @@
   <ItemGroup>
     <ClInclude Include="..\source\Chunk.h" />
     <ClInclude Include="..\source\ConnectionManager.hpp" />
+    <ClInclude Include="..\source\DecoratorConnectionManager.h" />
     <ClInclude Include="..\source\Engine.h" />
     <ClInclude Include="..\source\FileFrame.h" />
     <ClInclude Include="..\source\IConnection.h" />
-    <ClInclude Include="..\source\IDecorator.h" />
+    <ClInclude Include="..\source\IConnectionDecorator.h" />
     <ClInclude Include="..\source\Listener.h" />
     <ClInclude Include="..\source\ProtoConnection.h" />
     <ClInclude Include="..\source\SequenceNumber.h" />
@@ -96,10 +97,12 @@
   <ItemGroup>
     <ClCompile Include="..\source\Chunk.cpp" />
     <ClCompile Include="..\source\ConnectionManager.cpp" />
+    <ClCompile Include="..\source\DecoratorConnectionManager.cpp" />
     <ClCompile Include="..\source\Engine.cpp" />
     <ClCompile Include="..\source\FileFrame.cpp" />
     <ClCompile Include="..\source\FileShareEvents.cpp" />
     <ClCompile Include="..\source\IConnection.cpp" />
+    <ClCompile Include="..\source\IConnectionDecorator.cpp" />
     <ClCompile Include="..\source\InputThreading.cpp" />
     <ClCompile Include="..\source\Listener.cpp" />
     <ClCompile Include="..\source\ProtoConnection.cpp" />
