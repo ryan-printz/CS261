@@ -29,6 +29,7 @@ public:
 
 private:
     void AddFileToShare (const FileShareEvent & e, HSession session);
+    void SendFileList (HSession session);
 private:
     Engine m_engine;
     Timer m_timer;

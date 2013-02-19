@@ -17,7 +17,8 @@ enum EventType {
 	LISTCONNECTIONS_EVENT,
 	SHOWINFO_EVENT,
 	DECORATECONNECTION_EVENT,
-    FILESHARE_EVENT
+    FILESHARE_EVENT,
+    REQUESTFILELIST_EVENT
 };
 
 struct BaseEvent {
@@ -70,5 +71,11 @@ struct FileShareEvent : BaseEvent
     FileShareEvent() : BaseEvent(FILESHARE_EVENT) {};
     unsigned nameLength;
     const char * filename;
+    static types def[];
+};
+
+struct RequestFileListEvent : BaseEvent
+{
+    RequestFileListEvent() : BaseEvent(REQUESTFILELIST_EVENT) {};
     static types def[];
 };

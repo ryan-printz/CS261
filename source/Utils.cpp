@@ -24,8 +24,8 @@ std::string getFilenameList(const char* path)
 	  
 	if(    findFile == INVALID_HANDLE_VALUE)
 	{
-	printf("FindFirstFile in path %s failed\n", path);
-	return std::string("");
+        printf("FindFirstFile in path %s failed\n", path);
+        return std::string("");
 	}
 	std::string fileNameList;
 	std::string fileName;

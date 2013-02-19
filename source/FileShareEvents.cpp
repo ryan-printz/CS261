@@ -49,3 +49,8 @@ types FileShareEvent::def[] = {
     TYPE_UARRAYSIZE, TYPE_CHAR,
     TYPE_END
 };
+
+types RequestFileListEvent::def[] = {
+    TYPE_UNSIGNED,
+    TYPE_END
+};

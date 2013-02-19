@@ -46,6 +46,10 @@ void ReceiveEventCallback (HSession session, ubyte * data) {
             s_server->AddFileToShare(e, session);
         } break;
 
+    case REQUESTFILELIST_EVENT:
+        {
+            s_server->SendFileList(session);
+        }
     default:
         printf("Unsupported event type '%u' sent to receive callback", eType);
 		printf("Session: %s \n", s_server->m_engine.GetConnectionsInfo()->GetSessionInfo(session).c_str());
@@ -127,5 +131,29 @@ bool FileShareServer::Update () {
 void FileShareServer::AddFileToShare (const FileShareEvent & e, HSession session) {
     auto sessionItr = m_sessionList.find(session);
         
-    m_sessionList[session].push_back(e.filename);
+    printf("Listing file %s for user %s.\n", e.filename, m_engine.GetConnectionsInfo()->GetSessionInfo(session).c_str());
+    m_sessionList[session].push_back(std::string(e.filename));
+}
+
+//******************************************************************************
+void FileShareServer::SendFileList (HSession session) {
+
+    PrintStringEvent e;
+    e.string = "File list begin . . . . . . .";
+    e.stringSize = strlen(e.string) + 1;
+    m_engine.Send(e, session);
+
+    auto sessionItr = m_sessionList.begin();
+    for (; sessionItr != m_sessionList.end(); ++sessionItr) {
+        //if (sessionItr->first == session)
+            //continue;
+
+        auto fileArray = sessionItr->second;
+        auto fileItr = fileArray.begin();
+        for (; fileItr != fileArray.end(); ++fileItr) {
+            e.string = fileItr->c_str();
+            e.stringSize = fileItr->size() + 1;
+            m_engine.Send(e, session);
+        }
+    }
 }

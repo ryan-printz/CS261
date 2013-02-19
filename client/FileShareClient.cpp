@@ -265,6 +265,11 @@ void FileShareClient::HandleInputCommand (const std::string & command) {
 				ReceiveEventCallback(nullptr, (ubyte*)&e);
 			}
 		}
+        else if (tokens[0] == "LISTFILES")
+        {
+            RequestFileListEvent e;
+            m_engine.Send(e, m_tcpServer);
+        }
 		else
 		{
 			PrintStringEvent e;

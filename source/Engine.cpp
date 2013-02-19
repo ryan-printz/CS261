@@ -121,6 +121,7 @@ bool Engine::ToggleListenTcp (unsigned port) {
     return true;
 }
 
+//******************************************************************************
 const IConnectionInfo * Engine::GetConnectionsInfo() const
 {
 	return m_connectionManager;

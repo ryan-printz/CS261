@@ -1,5 +1,5 @@
 192.168.1.101
 8001
 8002
-store/
-share/
+store/*
+share/*
