@@ -7,15 +7,15 @@
 class DropConnectionDecorator : public IConnectionDecorator
 {
 public:
-	DropConnectionDecorator(float droprate)
+	DropConnectionDecorator(int droprate)
 	{
 		m_decorate = nullptr;
-		m_droprate = 1.0f / droprate;
+		m_droprate = droprate;
 	};
 
 	virtual int receive(ubyte * buffer, uint len) 
 	{
-		if( (std::rand() % 100 * m_droprate) > 1.0f )
+		if( (std::rand() % 100 <= m_droprate) )
 			return -1;
 
 		return m_decorate->receive(buffer, len);
@@ -29,5 +29,5 @@ public:
 	};
 
 protected:
-	float m_droprate;
+	int m_droprate;
 };

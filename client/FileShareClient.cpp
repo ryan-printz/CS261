@@ -87,7 +87,7 @@ void ReceiveEventCallback (HSession session, ubyte * data) {
 				dcm->Decorate( session, new LatencyConnectionDecorator(2.0f) );
 
 			else if( decoratorType == "DROP" )
-				dcm->Decorate( session, new DropConnectionDecorator(20.0f) );
+				dcm->Decorate( session, new DropConnectionDecorator(50) );
 
 		} break;
 

@@ -37,11 +37,11 @@ public:
 		packet.m_time = 0.0f;
 		packet.m_size = m_decorate->receive( packet.m_packet, len );
 
-		if( packet.m_size > 0 )
+		if( (int)packet.m_size > 0 )
 			m_packets.push_back( packet );
 
 
-		if( m_packets.size() )
+		if( !m_packets.empty() )
 		{
 			if( m_packets.front().m_time >= m_delay )
 			{
