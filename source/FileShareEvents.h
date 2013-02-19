@@ -64,6 +64,8 @@ struct DecorateConnectionEvent : BaseEvent
 	DecorateConnectionEvent() : BaseEvent(DECORATECONNECTION_EVENT) {};
 	unsigned connectionID;
 	const char * decoratorType;
+	unsigned highModifier;
+	unsigned lowModifier;
 	static types def[];
 };
 

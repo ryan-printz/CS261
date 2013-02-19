@@ -66,6 +66,8 @@ std::string TCPConnection::connectionInfo() const
 	else
 		info << "not connected.";
 
+	info << std::endl << "-----------------------" << std::endl;
+
 	return info.str();
 }
 

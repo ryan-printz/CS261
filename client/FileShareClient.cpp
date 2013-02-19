@@ -82,10 +82,10 @@ void ReceiveEventCallback (HSession session, ubyte * data) {
 			std::transform(decoratorType.begin(), decoratorType.end(), decoratorType.begin(), ::toupper);
 
 			if( decoratorType == "LATENCY" )
-				dcm->Decorate( session, new LatencyConnectionDecorator(2.0f) );
+				dcm->Decorate( session, new LatencyConnectionDecorator(de->highModifier, de->lowModifier) );
 
 			else if( decoratorType == "DROP" )
-				dcm->Decorate( session, new DropConnectionDecorator(50) );
+				dcm->Decorate( session, new DropConnectionDecorator(de->highModifier, de->lowModifier) );
 
 		} break;
 
@@ -259,17 +259,25 @@ void FileShareClient::HandleInputCommand (const std::string & command) {
 		{
 			if(tokens.size() < 2)
 			{
-				printf("Please use the format DECORATE <connectionID> [DROP|LATENCY]\n");
+				printf("Please use the format DECORATE <connectionID> [DROP|LATENCY][h	ighModifier][lowModifier]\n");
 			}
 			else
 			{
 				DecorateConnectionEvent e;
 				e.connectionID = std::stoi(tokens[1]);
 
-				if(tokens.size() < 3)
-					e.decoratorType = nullptr;
-				else
+				if(tokens.size() >= 4) 
+				{
 					e.decoratorType = tokens[2].c_str();
+
+					e.highModifier = std::stoi(tokens[3]);
+
+					if( tokens.size() >= 5 )
+						e.lowModifier = std::stoi(tokens[4]);
+				}
+				if(tokens.size() < 4)
+					e.decoratorType = nullptr;
+
 
 				ReceiveEventCallback(nullptr, (ubyte*)&e);
 			}

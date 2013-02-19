@@ -368,11 +368,13 @@ std::string ProtoConnection::connectionInfo() const
 	std::stringstream info;
 	info << "UDP Connection:";
 
-	if( !m_socket )
-		info << " " << inet_ntoa(m_connection.sin_addr) << ":" << ntohs(m_connection.sin_port) 
-			 << std::endl << m_stats;
+	if( m_connected )
+		info << " " << m_socket->ipAddress() << ":" << m_socket->port() << std::endl;
 	else
 		info << " not connected.";
+
+	info << std::endl << "-----------------------" << std::endl;
+	info << m_stats << std::endl;
 
 	return info.str();
 }
@@ -458,9 +460,12 @@ bool ProtoConnection::connected() const
 std::ostream & operator<<(std::ostream & os, const ConnectionStats & stats)
 {
 	std::ostream::sentry ok(os);
-	os << stats.m_upBandwidth << "/" << stats.m_downBandwith << "up/down. ping: " << stats.m_roundTripTime << std::endl; 
-	os << "lifetime sent:" << stats.m_sentPackets << " acked: " << stats.m_ackedPackets;
-	os << " received: " << stats.m_receivedPackets << " lost: " << stats.m_lostPackets;
+	os << "up/down bandwidth: " << stats.m_upBandwidth << "/" << stats.m_downBandwith << std::endl;
+	os << "ping: " << stats.m_roundTripTime << std::endl; 
+	os << "lifetime sent: " << stats.m_sentPackets << std::endl;
+	os << "lifetime acked: " << stats.m_ackedPackets << std::endl;
+	os << "lifetime received: " << stats.m_receivedPackets << std::endl; 
+	os << "lifetime lost: " << stats.m_lostPackets;
 	return os;
 }
 
