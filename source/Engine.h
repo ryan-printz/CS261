@@ -15,6 +15,7 @@
 
 typedef struct DevSession {} * HSession;
 
+class IConnectionInfo;
 class ConnectionManager;
 class Listener;
 
@@ -36,11 +37,10 @@ public:
     void Update (float dt);
     void ShutDown ();
 
+	const IConnectionInfo * GetConnectionsInfo() const;
+
     HSession ConnectTcp (char * remoteIp, unsigned remotePort);
     bool ToggleListenTcp (unsigned port);
-
-    // single session specifics
-    std::string GetSessionInfo (HSession session) const;
 
     template <typename T>
     void Send (T & event, HSession session);

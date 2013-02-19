@@ -15,7 +15,15 @@ struct DevSession;
 typedef DevSession * HSession;
 class IConnection;
 
-class ConnectionManager {
+class IConnectionInfo
+{
+public:
+	virtual unsigned Count() const = 0;
+	virtual std::string GetSessionInfo(HSession session) const = 0;
+	virtual std::string GetAllSessionInfo() const = 0;
+};
+
+class ConnectionManager : public IConnectionInfo {
 public:
     ConnectionManager  () {}
     virtual ~ConnectionManager ();
@@ -28,8 +36,11 @@ public:
     int Receive (unsigned char * buffer, unsigned bufferLen, HSession& sessionOut);
 
     bool IsHandleValid (HSession session) const;
-    
+
+	virtual unsigned Count() const;
+	virtual std::string GetAllSessionInfo() const;
     std::string GetSessionInfo (HSession session) const;
+
     void ClearDeleteList ();
 
 protected:

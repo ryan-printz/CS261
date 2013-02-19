@@ -39,10 +39,6 @@ Engine::~Engine () {
     }
 }
 
-std::string Engine::GetSessionInfo (HSession session) const {
-    return m_connectionManager->GetSessionInfo(session);
-}
-
 //******************************************************************************
 bool Engine::Initialize () {
     return initSockets(true);
@@ -100,6 +96,11 @@ bool Engine::ToggleListenTcp (unsigned port) {
     m_listenList[port] = newListener;
 
     return true;
+}
+
+const IConnectionInfo * Engine::GetConnectionsInfo() const
+{
+	return m_connectionManager;
 }
 
 //******************************************************************************

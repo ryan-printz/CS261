@@ -7,7 +7,9 @@
 */
 #include <cassert>
 #include "IConnection.h"
-#include "ConnectionManager.hpp"
+#include "ConnectionManager.h"
+
+#include <sstream>
 
 //******************************************************************************
 //ConnectionManager::ConnectionManager () {
@@ -18,6 +20,24 @@
 ConnectionManager::~ConnectionManager () {
 
     ClearDeleteList();
+}
+
+unsigned ConnectionManager::Count() const
+{
+	return m_connections.size();
+}
+
+std::string ConnectionManager::GetAllSessionInfo() const
+{
+	std::stringstream info;
+
+	info << "Current Sessions: " << Count() << std::endl << "--------------------------------------------------" << std::endl;
+
+	int i = 0;
+	for(auto connection = m_connections.begin(); connection != m_connections.end(); ++connection)
+		info << i++ << ": " << connection->second->connected() << std::endl;
+
+	return info.str();
 }
 
 //******************************************************************************

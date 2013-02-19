@@ -1,6 +1,6 @@
 #pragma once
 
-#include "ConnectionManager.hpp"
+#include "ConnectionManager.h"
 #include "IConnectionDecorator.h"
 
 class DecoratorConnectionManager : public ConnectionManager

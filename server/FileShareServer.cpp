@@ -10,6 +10,7 @@
 #include "FileShareServer.h"
 #include "../source/Serialization.h"
 #include "../source/FileShareEvents.h"
+#include "ConnectionManager.h"
 #include <cassert>
 #include <fstream>
 
@@ -29,7 +30,7 @@ void ReceiveEventCallback (HSession session, ubyte * data) {
             Packer p;
             p.unpack(e, data);
             printf("Received print\n");
-            printf("Session: %s \n", s_server->m_engine.GetSessionInfo(session).c_str());
+			printf("Session: %s \n", s_server->m_engine.GetConnectionsInfo()->GetSessionInfo(session).c_str());
             printf("%s \n", e.string);
 
             // echo to test receive on client side
@@ -37,7 +38,7 @@ void ReceiveEventCallback (HSession session, ubyte * data) {
         } break;
     default:
         printf("Unsupported event type '%u' sent to receive callback", eType);
-        printf("Session: %s \n", s_server->m_engine.GetSessionInfo(session).c_str());
+		printf("Session: %s \n", s_server->m_engine.GetConnectionsInfo()->GetSessionInfo(session).c_str());
         break;
     }
 }

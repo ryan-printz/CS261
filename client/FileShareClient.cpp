@@ -15,6 +15,7 @@
 #include <iterator>
 #include <cassert>
 #include "FileShareClient.h"
+#include "ConnectionManager.h"
 #include "../source/InputThreading.h"
 #include "../source/FileShareEvents.h"
 
@@ -44,12 +45,18 @@ void ReceiveEventCallback (HSession session, ubyte * data) {
             Packer p;
             p.unpack(e, data);
             printf("Received print\n");
-            printf("Session: %s \n", s_client->m_engine.GetSessionInfo(session).c_str());
+            printf("Session: %s \n", s_client->m_engine.GetConnectionsInfo()->GetSessionInfo(session).c_str());
             printf("%s \n", e.string);
         } break;
+
+	case LISTCONNECTIONS_EVENT:
+		{
+			s_client->m_engine;
+		} break;
+
     default:
         printf("Unsupported event type '%u' sent to receive callback", eType);
-        printf("Session: %s \n", s_client->m_engine.GetSessionInfo(session).c_str());
+        printf("Session: %s \n", s_client->m_engine.GetConnectionsInfo()->GetSessionInfo(session).c_str());
         break;
     }
 }

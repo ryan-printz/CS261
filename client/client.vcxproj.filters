@@ -61,9 +61,6 @@
     <ClInclude Include="..\source\Chunk.h">
       <Filter>headers</Filter>
     </ClInclude>
-    <ClInclude Include="..\source\ConnectionManager.hpp">
-      <Filter>headers</Filter>
-    </ClInclude>
     <ClInclude Include="..\source\Engine.h">
       <Filter>headers</Filter>
     </ClInclude>
@@ -107,6 +104,9 @@
       <Filter>headers</Filter>
     </ClInclude>
     <ClInclude Include="..\source\IConnectionDecorator.h">
+      <Filter>headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\ConnectionManager.h">
       <Filter>headers</Filter>
     </ClInclude>
   </ItemGroup>
