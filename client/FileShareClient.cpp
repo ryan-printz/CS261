@@ -48,8 +48,6 @@ void ReceiveEventCallback (HSession session, ubyte * data) {
             PrintStringEvent e;
             Packer p;
             p.unpack(e, data);
-            printf("Received print\n");
-            printf("Session: %s \n", s_client->m_engine.GetConnectionsInfo()->GetSessionInfo(session).c_str());
             printf("%s \n", e.string);
         } break;
 
@@ -155,7 +153,18 @@ bool FileShareClient::Initialize () {
     if (!(m_tcpServer = m_engine.ConnectTcp(serverAddress, atoi(serverPort))))
         return false;
 
-    // send list of shared files
+    // first, send client's UDP info as the first "filename"
+	std::string clientInfo;
+	clientInfo.append(m_engine.GetLocalIp());
+	clientInfo.push_back(' ');
+	clientInfo.append(udpListenPort);
+
+	FileShareEvent clientInfoEvent;
+	clientInfoEvent.filename = clientInfo.c_str();
+	clientInfoEvent.nameLength = clientInfo.size() + 1;
+	m_engine.Send(clientInfoEvent, m_tcpServer);
+
+	// get and send actual filenames
     std::string fileList = getFilenameList(m_sharePath.c_str());
 
     while (fileList.size() > 0) {

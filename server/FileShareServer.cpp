@@ -30,8 +30,6 @@ void ReceiveEventCallback (HSession session, ubyte * data) {
             PrintStringEvent e;
             Packer p;
             p.unpack(e, data);
-            printf("Received print\n");
-			printf("Session: %s \n", s_server->m_engine.GetConnectionsInfo()->GetSessionInfo(session).c_str());
             printf("%s \n", e.string);
 
             // echo to test receive on client side
@@ -49,7 +47,7 @@ void ReceiveEventCallback (HSession session, ubyte * data) {
     case REQUESTFILELIST_EVENT:
         {
             s_server->SendFileList(session);
-        }
+        } break;
     default:
         printf("Unsupported event type '%u' sent to receive callback", eType);
 		printf("Session: %s \n", s_server->m_engine.GetConnectionsInfo()->GetSessionInfo(session).c_str());
@@ -139,7 +137,7 @@ void FileShareServer::AddFileToShare (const FileShareEvent & e, HSession session
 void FileShareServer::SendFileList (HSession session) {
 
     PrintStringEvent e;
-    e.string = "File list begin . . . . . . .";
+    e.string = "*******File list begin*******";
     e.stringSize = strlen(e.string) + 1;
     m_engine.Send(e, session);
 
@@ -156,4 +154,8 @@ void FileShareServer::SendFileList (HSession session) {
             m_engine.Send(e, session);
         }
     }
+
+	e.string = "*******File list end*******\n";
+    e.stringSize = strlen(e.string) + 1;
+    m_engine.Send(e, session);
 }

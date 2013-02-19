@@ -198,3 +198,8 @@ void Engine::Send (unsigned char * buffer, unsigned bufferLen, HSession session)
     else
         m_connectionManager->Broadcast(buffer, bufferLen);
 } 
+
+//******************************************************************************
+const char * Engine::GetLocalIp () {
+	return Socket::localIP();
+}

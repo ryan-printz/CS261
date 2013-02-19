@@ -218,6 +218,8 @@ int Socket::send(const ubyte * buffer, uint size)
 
 	if( sent == SOCKET_ERROR )
 		m_error = WSAGetLastError();
+	else
+		Sleep(1);
 
 	return sent;
 }

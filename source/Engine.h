@@ -48,6 +48,8 @@ public:
     template <typename T>
     void Send (T & event, HSession session);
 
+    const char * GetLocalIp ();
+
 private:
     void Listen ();
     void Send(ubyte * buffer, unsigned bufferLen, HSession session);
