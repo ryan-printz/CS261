@@ -21,7 +21,7 @@ public:
 		
 		// maintain sanity.
 		if( high < low )	std::swap(high, low);
-		if( high > 100 )	high = 100;
+		if( high > 1000 )	high = 1000;
 		if( low < 0 )		low = 0;
 
 		m_highDelay = high;
@@ -41,7 +41,7 @@ public:
 	virtual int receive(ubyte * buffer, uint len)
 	{
 		Delayed packet;
-		packet.m_time = (std::rand() % (m_highDelay-m_lowDelay)) + m_lowDelay;
+		packet.m_time = float((std::rand() % (m_highDelay-m_lowDelay)) + m_lowDelay) / 1000.f;
 		packet.m_size = m_decorate->receive( packet.m_packet, len );
 
 		if( (int)packet.m_size > 0 )

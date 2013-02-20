@@ -259,7 +259,7 @@ void FileShareClient::HandleInputCommand (const std::string & command) {
 		{
 			if(tokens.size() < 2)
 			{
-				printf("Please use the format DECORATE <connectionID> [DROP|LATENCY][h	ighModifier][lowModifier]\n");
+				printf("Please use the format DECORATE <connectionID> [DROP|LATENCY] [highModifier] [lowModifier]\n");
 			}
 			else
 			{
