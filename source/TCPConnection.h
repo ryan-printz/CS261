@@ -9,7 +9,7 @@ public:
 	TCPConnection();
 
 	virtual bool accept(Socket * open);
-	virtual bool connect(char * ip, uint port);
+	virtual bool connect(const char * ip, uint port);
 	virtual bool cleanup();
 	virtual bool disconnect();
 

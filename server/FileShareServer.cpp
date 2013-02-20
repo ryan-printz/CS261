@@ -56,7 +56,7 @@ void ReceiveEventCallback (HSession session, ubyte * data) {
 			Packer p;
 			p.unpack(e, data);
 			s_server->HandleFileRequest(e, session);
-		}
+		} break;
     default:
         printf("Unsupported event type '%u' sent to receive callback", eType);
 		printf("Session: %s \n", s_server->m_engine.GetConnectionsInfo()->GetSessionInfo(session).c_str());
@@ -146,26 +146,15 @@ void FileShareServer::AddFileToShare (const FileShareEvent & e, HSession session
 void FileShareServer::SendFileList (HSession session) {
 
 	std::string toSend("*******File list begin*******\n");
-    PrintStringEvent e;
-    //e.string = "*******File list begin*******";
-    //e.stringSize = strlen(e.string) + 1;
-    //m_engine.Send(e, session);
 
     auto sessionItr = m_sessionList.begin();
     for (; sessionItr != m_sessionList.end(); ++sessionItr) {
-        //if (sessionItr->first == session)
-            //continue;
+
+        if (sessionItr->first == session)
+            continue;
 
 		char sessionIdBuff[256];
 		itoa((int)(sessionItr->first), sessionIdBuff, 10);
-
-		//std::string sessionIdString;
-		//sessionIdString.append("SessionId: ");
-		//sessionIdString.append(sessionIdBuff);
-		//PrintStringEvent sessionId;
-		//sessionId.string = sessionIdString.c_str();
-		//sessionId.stringSize = sessionIdString.size() + 1;
-		//m_engine.Send(sessionId, session);
 
 		toSend.append("SessionId: ");
 		toSend.append(sessionIdBuff);
@@ -175,20 +164,15 @@ void FileShareServer::SendFileList (HSession session) {
         auto fileItr = fileArray.begin();
 		++fileItr; // first element is user's ip & udp listen port.
         for (; fileItr != fileArray.end(); ++fileItr) {
-            //e.string = fileItr->c_str();
-            //e.stringSize = fileItr->size() + 1;
-            //m_engine.Send(e, session);
 			toSend.append(fileItr->c_str());
 			toSend.append("\n");
         }
+        toSend.append("\n");
     }
-	
-
-	//e.string = "*******File list end*******\n";
-    //e.stringSize = strlen(e.string) + 1;
 
 	toSend.append("*******File list end*******\n");
 
+    PrintStringEvent e;
 	e.string = toSend.c_str();
 	e.stringSize = toSend.size() + 1;
     m_engine.Send(e, session);

@@ -17,7 +17,7 @@ bool TCPConnection::accept(Socket * listener)
 	return !accepted.invalid();
 }
 
-bool TCPConnection::connect(char * ip, uint port)
+bool TCPConnection::connect(const char * ip, uint port)
 {
 	if( !m_connection.initializeTCP(ip, port) )
 		return false;

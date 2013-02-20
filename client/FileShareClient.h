@@ -12,6 +12,7 @@
 #include <unordered_map>
 #include "../source/Engine.h"
 #include "../source/Timer.h"
+#include "../source/FileShareEvents.h"
 
 struct fileInfo {
     std::string filename;
@@ -32,6 +33,7 @@ public:
 
 private:
     void HandleInputCommand (const std::string & command);
+    void InitiateFileTransfer (const StartTransferEvent & e);
 
 private:
     Engine m_engine;

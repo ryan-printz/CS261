@@ -39,10 +39,10 @@ public:
 
 	const IConnectionInfo * GetConnectionsInfo() const;
 
-    HSession ConnectTcp (char * remoteIp, unsigned remotePort);
+    HSession ConnectTcp (const char * remoteIp, unsigned remotePort);
     bool ToggleListenTcp (unsigned port);
 
-    HSession ConnectUdp (char * remoteIp, unsigned remotePort);
+    HSession ConnectUdp (const char * remoteIp, unsigned remotePort);
     bool ToggleListenUdp (unsigned port);
 
     template <typename T>

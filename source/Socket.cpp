@@ -38,7 +38,7 @@ char * Socket::localIP()
 	return inet_ntoa( *(in_addr*)*entity->h_addr_list );
 }
 
-bool Socket::initializeTCP(char * ipAddress, uint port, uint family)
+bool Socket::initializeTCP(const char * ipAddress, uint port, uint family)
 {
 	m_address.sin_family = family;
 	m_address.sin_port = htons(port);
@@ -55,7 +55,7 @@ bool Socket::initializeTCP(char * ipAddress, uint port, uint family)
 	return true;
 }
 
-bool Socket::initializeUDP(char * ipAddress, uint port, uint family)
+bool Socket::initializeUDP(const char * ipAddress, uint port, uint family)
 {
 	m_address.sin_family = family;
 	m_address.sin_port = htons(port);

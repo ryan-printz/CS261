@@ -13,7 +13,7 @@ public:
 	// connection setup/teardown
 	// accept requires a fully initialized "listening" socket.
 	virtual bool accept(Socket * open) = 0;
-	virtual bool connect(char * ip, uint port) = 0;
+	virtual bool connect(const char * ip, uint port) = 0;
 	virtual bool cleanup() = 0;
 	virtual bool disconnect() = 0;
 

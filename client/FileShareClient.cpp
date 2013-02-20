@@ -51,6 +51,13 @@ void ReceiveEventCallback (HSession session, ubyte * data) {
             printf("%s \n", e.string);
         } break;
 
+    case STARTTRANSFER_EVENT:
+        {
+            StartTransferEvent e;
+            Packer p;
+            p.unpack(e, data);
+            s_client->InitiateFileTransfer(e);
+        } break;
 	case LISTCONNECTIONS_EVENT:
 		{
 			printf("%s\n", s_client->m_engine.GetConnectionsInfo()->GetAllSessionInfo().c_str());
@@ -202,6 +209,13 @@ bool FileShareClient::Update () {
 
     m_engine.Update(m_timer.Update());
     return m_quit;
+}
+
+//******************************************************************************
+void FileShareClient::InitiateFileTransfer (const StartTransferEvent & e) {
+    //Initiate connection
+    m_engine.ConnectTcp(e.hostIp, e.hostPort);
+    //Request file
 }
 
 //******************************************************************************

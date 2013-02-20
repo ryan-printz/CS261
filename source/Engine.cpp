@@ -51,7 +51,7 @@ void Engine::ShutDown () {
 }
 
 //******************************************************************************
-HSession Engine::ConnectTcp (char * remoteIp, unsigned remotePort) {
+HSession Engine::ConnectTcp (const char * remoteIp, unsigned remotePort) {
     assert(remoteIp != nullptr);
 
     // I shouldn't have to know anything about this at engine level
@@ -78,7 +78,7 @@ HSession Engine::ConnectTcp (char * remoteIp, unsigned remotePort) {
 }
 
 //******************************************************************************
-HSession Engine::ConnectUdp (char * remoteIp, unsigned remotePort) {
+HSession Engine::ConnectUdp (const char * remoteIp, unsigned remotePort) {
     ProtoConnection * newConnection = new ProtoConnection;
 
     if (!newConnection) {

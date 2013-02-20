@@ -15,8 +15,8 @@ public:
 
 	static char * localIP();
 
-	bool initializeTCP(char * ipAddress, uint port, uint family = AF_INET);
-	bool initializeUDP(char * ipAddress, uint port, uint family = AF_INET);
+	bool initializeTCP(const char * ipAddress, uint port, uint family = AF_INET);
+	bool initializeUDP(const char * ipAddress, uint port, uint family = AF_INET);
 	bool cleanUp();
 
 	bool bind();

@@ -47,7 +47,7 @@ bool ProtoConnection::accept(Socket * socket)
 	return true;
 }
 
-bool ProtoConnection::connect(char * IP, uint port)
+bool ProtoConnection::connect(const char * IP, uint port)
 {
 	m_socket = new Socket();
 

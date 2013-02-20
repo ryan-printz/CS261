@@ -31,7 +31,7 @@ bool IConnectionDecorator::accept(Socket * open)
 	return m_decorate->accept(open); 
 }
 
-bool IConnectionDecorator::connect(char * ip, uint port)
+bool IConnectionDecorator::connect(const char * ip, uint port)
 {
 	return m_decorate->connect(ip, port);
 }
