@@ -2,29 +2,31 @@
 #include <string>
 #include <Strsafe.h>
 
-std::string getFilenameList(const char* path)
+std::string getFilenameList(const char* cpath)
 {
 	char dirName[MAX_PATH];
-	
+	std::string path(cpath);
+    path.append("*");
+
 	size_t pathLength;
-	StringCchLengthA(path, MAX_PATH, &pathLength);
+	StringCchLengthA(path.c_str(), MAX_PATH, &pathLength);
 	
 	if(pathLength > MAX_PATH)
 	{
 	printf("File path is too long.\n");
 	return std::string("");
 	}
-	printf("Reading files names in path: %s\n", path);
+	printf("Reading files names in path: %s\n", path.c_str());
 	  
-	StringCchCopyA(dirName, MAX_PATH, path );
+	StringCchCopyA(dirName, MAX_PATH, path.c_str() );
 	StringCchCatA(dirName, MAX_PATH, "/*");
 	
 	WIN32_FIND_DATAA fileInfo;
-	HANDLE findFile = FindFirstFileA(path, &fileInfo);
+	HANDLE findFile = FindFirstFileA(path.c_str(), &fileInfo);
 	  
 	if(    findFile == INVALID_HANDLE_VALUE)
 	{
-        printf("FindFirstFile in path %s failed\n", path);
+        printf("FindFirstFile in path %s failed\n", path.c_str());
         return std::string("");
 	}
 	std::string fileNameList;
@@ -35,6 +37,8 @@ std::string getFilenameList(const char* path)
         {
             fileName = fileInfo.cFileName;
             fileName += "\n";
+
+            printf("Sharing file %s", fileName.c_str());
 
             if(fileNameList.find(fileName) == std::string::npos)
                 fileNameList  +=  fileName;

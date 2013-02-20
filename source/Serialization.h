@@ -87,6 +87,8 @@ private:
     template <typename T>
     void CreatePackBuffer (T &E, ubyte ** buffer, unsigned & bufferLen) 
     {
+        unsigned offset = 0;
+        bufferLen = 0;
         for(int i = 0; E.def[i] != TYPE_END; ++i)
         {
             switch (E.def[i])
@@ -94,14 +96,17 @@ private:
             case TYPE_UARRAYSIZE:
                 {
                     unsigned temp;
-                    memcpy(&temp, (ubyte*)(&E) + bufferLen, m_sizeArray[TYPE_UARRAYSIZE]);
+                    memcpy(&temp, (ubyte*)(&E) + offset, m_sizeArray[TYPE_UARRAYSIZE]);
                     bufferLen += m_sizeArray[TYPE_UARRAYSIZE];
+                    offset += m_sizeArray[TYPE_UARRAYSIZE];
                     ++i;
                     bufferLen += m_sizeArray[E.def[i]]*temp;
+                    offset += sizeof(void*);
                     break;
                 }
             default:
                 bufferLen += m_sizeArray[E.def[i]];
+                offset += m_sizeArray[E.def[i]];
                 break;
             }
         }

@@ -50,12 +50,12 @@ void ReceiveEventCallback (HSession session, ubyte * data) {
             s_server->SendFileList(session);
         } break;
 
-	case GETFILE_EVENT:
+	case GETFILEHOSTINFO_EVENT:
 		{
-			GetFileEvent e;
+			GetFileHostInfoEvent e;
 			Packer p;
 			p.unpack(e, data);
-			s_server->HandleFileRequest(e, session);
+			s_server->HandleFileHostInfoRequest(e, session);
 		} break;
     default:
         printf("Unsupported event type '%u' sent to receive callback", eType);
@@ -179,7 +179,7 @@ void FileShareServer::SendFileList (HSession session) {
 }
 
 //******************************************************************************
-void FileShareServer::HandleFileRequest(const GetFileEvent & e, HSession session) {
+void FileShareServer::HandleFileHostInfoRequest(const GetFileHostInfoEvent & e, HSession session) {
 	auto sessionItr = m_sessionList.find((HSession)e.from);
 
 	if (sessionItr == m_sessionList.end()) {
@@ -210,12 +210,12 @@ void FileShareServer::HandleFileRequest(const GetFileEvent & e, HSession session
 
 	std::string hostInfo = sessionItr->second[0];
 
-	StartTransferEvent eT;
+	FileHostInfoEvent eT;
 	eT.file = e.file;
 	eT.fileSize = e.fileSize;
 	std::string tempIp = getword(hostInfo);
 	eT.hostIp = tempIp.c_str();
 	eT.ipSize = strlen(eT.hostIp) + 1;
 	eT.hostPort = atoi(getword(hostInfo).c_str());
-	m_engine.Send(e, session);
+	m_engine.Send(eT, session);
 }

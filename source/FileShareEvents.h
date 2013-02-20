@@ -13,13 +13,16 @@
 enum EventType {
     BASE_EVENT,
     PRINTSTRING_EVENT,
-	GETFILE_EVENT,
+	GETFILEHOSTINFO_EVENT,
 	LISTCONNECTIONS_EVENT,
 	SHOWINFO_EVENT,
 	DECORATECONNECTION_EVENT,
     FILESHARE_EVENT,
     REQUESTFILELIST_EVENT,
-	STARTTRANSFER_EVENT
+	FILEHOSTINFO_EVENT,
+    PACKET_EVENT,
+    NEWFILEINFO_EVENT,
+    NEWCHUNKINFO_EVENT
 };
 
 struct BaseEvent {
@@ -37,9 +40,9 @@ struct PrintStringEvent : BaseEvent {
     static types def[];
 };
 
-struct GetFileEvent : BaseEvent 
+struct GetFileHostInfoEvent : BaseEvent 
 {
-	GetFileEvent() : BaseEvent(GETFILE_EVENT) {};
+	GetFileHostInfoEvent() : BaseEvent(GETFILEHOSTINFO_EVENT) {};
 	unsigned fileSize;
 	const char * file;
 	unsigned from;
@@ -83,13 +86,44 @@ struct RequestFileListEvent : BaseEvent
     static types def[];
 };
 
-struct StartTransferEvent : BaseEvent
+struct FileHostInfoEvent : BaseEvent
 {
-	StartTransferEvent() : BaseEvent(STARTTRANSFER_EVENT) {}
+	FileHostInfoEvent() : BaseEvent(FILEHOSTINFO_EVENT) {}
+    unsigned hostPort;
 	unsigned fileSize;
 	const char * file;
 	unsigned ipSize;
 	const char * hostIp;
-	unsigned hostPort;
 	static types def[];
+};
+
+struct NewFileInfoEvent : BaseEvent {
+    NewFileInfoEvent() : BaseEvent(NEWFILEINFO_EVENT) {}
+    unsigned fileSize;
+    unsigned totalChunks;
+    unsigned filenameSize;
+    const char * filename;
+    static types def[];
+};
+
+struct PacketEvent : BaseEvent {
+    PacketEvent() : BaseEvent(PACKET_EVENT) {}
+    unsigned packetNum;
+    unsigned totalPackets;
+    unsigned chunkNum;
+    unsigned filenameSize;
+    const char * filename;
+    unsigned packetSize;
+    char * data;
+    static types def[];
+};
+
+struct NewChunkInfoEvent : BaseEvent {
+    NewChunkInfoEvent() : BaseEvent(NEWCHUNKINFO_EVENT) {}
+    unsigned chunkNum;
+    unsigned chunkSize;
+    unsigned numPackets;
+    unsigned filenameSize;
+    const char * filename;
+    static types def[];
 };

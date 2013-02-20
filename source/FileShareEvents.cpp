@@ -19,7 +19,7 @@ types PrintStringEvent::def[] = {
     TYPE_END
 };
 
-types GetFileEvent::def[] = {
+types GetFileHostInfoEvent::def[] = {
     TYPE_UNSIGNED, 
     TYPE_UARRAYSIZE, TYPE_CHAR,
     TYPE_UNSIGNED,
@@ -33,17 +33,17 @@ types ListConnectionsEvent::def[] = {
 
 types ShowInfoEvent::def[] = {
     TYPE_UNSIGNED, 
-	TYPE_UNSIGNED,
+    TYPE_UNSIGNED,
     TYPE_END
 };
 
 types DecorateConnectionEvent::def[] = {
-	TYPE_UNSIGNED,
-	TYPE_UNSIGNED,
-	TYPE_UARRAYSIZE, TYPE_CHAR,
-	TYPE_UNSIGNED,
-	TYPE_UNSIGNED,
-	TYPE_END
+    TYPE_UNSIGNED,
+    TYPE_UNSIGNED,
+    TYPE_UARRAYSIZE, TYPE_CHAR,
+    TYPE_UNSIGNED,
+    TYPE_UNSIGNED,
+    TYPE_END
 };
 
 types FileShareEvent::def[] = {
@@ -57,10 +57,37 @@ types RequestFileListEvent::def[] = {
     TYPE_END
 };
 
-types StartTransferEvent::def[] = {
-	TYPE_UNSIGNED,
-	TYPE_UARRAYSIZE, TYPE_CHAR,
-	TYPE_UARRAYSIZE, TYPE_CHAR,
-	TYPE_UNSIGNED,
-	TYPE_END
+types FileHostInfoEvent::def[] = {
+    TYPE_UNSIGNED,
+    TYPE_UNSIGNED,
+    TYPE_UARRAYSIZE, TYPE_CHAR,
+    TYPE_UARRAYSIZE, TYPE_CHAR,
+    TYPE_END
+};
+
+types NewFileInfoEvent::def[] = {
+    TYPE_UNSIGNED,
+    TYPE_UNSIGNED,
+    TYPE_UNSIGNED,
+    TYPE_UARRAYSIZE, TYPE_CHAR,
+    TYPE_END
+};
+
+types PacketEvent::def[] = {
+    TYPE_UNSIGNED,
+    TYPE_UNSIGNED,
+    TYPE_UNSIGNED,
+    TYPE_UNSIGNED,
+    TYPE_UARRAYSIZE, TYPE_CHAR,
+    TYPE_UARRAYSIZE, TYPE_CHAR,
+    TYPE_END
+};
+
+types NewChunkInfoEvent::def[] = {
+    TYPE_UNSIGNED,
+    TYPE_UNSIGNED,
+    TYPE_UNSIGNED,
+    TYPE_UNSIGNED,
+    TYPE_UARRAYSIZE, TYPE_CHAR,
+    TYPE_END
 };

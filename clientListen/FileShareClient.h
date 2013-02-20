@@ -27,7 +27,7 @@ public:
         , m_maxWaitCount(10) {}
     
     bool operator== (const TransferSession & rhs) { return (m_session == rhs.m_session 
-                                                  && m_filename == rhs.m_filename);}
+        && m_filename == rhs.m_filename);}
 
     // all data is public because honey badger.
     HSession m_session;
@@ -58,7 +58,6 @@ private:
     void InitiateFileTransfer (const FileHostInfoEvent & e);
     void BeginFileTransfer (const char * filename, HSession session);
     void UpdateTransferSession (TransferSession & tSession);
-    void InsertPacket (const PacketEvent & e, HSession session);
 
 private:
     Engine m_engine;
