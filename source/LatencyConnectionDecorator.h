@@ -38,11 +38,11 @@ public:
 		m_decorate->update(dt);
 	}
 
-	virtual int receive(ubyte * buffer, uint len)
+	virtual int receive(ubyte * buffer, uint len, int drop = 0)
 	{
 		Delayed packet;
 		packet.m_time = float((std::rand() % (m_highDelay-m_lowDelay)) + m_lowDelay) / 1000.f;
-		packet.m_size = m_decorate->receive( packet.m_packet, len );
+		packet.m_size = m_decorate->receive( packet.m_packet, len, drop );
 
 		if( (int)packet.m_size > 0 )
 			m_packets.push_back( packet );

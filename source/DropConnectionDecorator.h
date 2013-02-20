@@ -20,12 +20,14 @@ public:
 		m_lowDrop = low;
 	};
 
-	virtual int receive(ubyte * buffer, uint len) 
+	virtual int receive(ubyte * buffer, uint len, int drop = 0) 
 	{
-		if( (std::rand() % 100) + m_lowDrop > (100 - m_highDrop) )
-			return -1;
+		int test = 0;
+		int temp = (std::rand() % (m_highDrop-m_lowDrop)) + m_lowDrop;
+		if( (std::rand() % 100) <= temp )
+			test = -1;
 
-		return m_decorate->receive(buffer, len);
+		return m_decorate->receive(buffer, len, test);
 	}
 
 	virtual std::string connectionInfo() const

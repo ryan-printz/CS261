@@ -20,7 +20,7 @@ public:
 	virtual bool connected() const = 0;
 
 	// send/receive
-	virtual int receive(ubyte * buffer, uint len) = 0;
+	virtual int receive(ubyte * buffer, uint len, int drop = 0) = 0;
 	virtual int send(ubyte * buffer, uint len, ubyte flags = 0) = 0;
 
 	// update connection

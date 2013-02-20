@@ -145,7 +145,7 @@ int ProtoConnection::noFlowSend(ubyte * buffer, uint len, ubyte flags)
 }
 
 // receives a datagram.
-int ProtoConnection::receive(ubyte * buffer, uint len)
+int ProtoConnection::receive(ubyte * buffer, uint len, int drop)
 {
 	ubyte packet[256];
 	uint headerSize = sizeof(ProtoHeader);
@@ -164,6 +164,10 @@ int ProtoConnection::receive(ubyte * buffer, uint len)
 		m_connected = false;
 		return 0;
 	}
+
+	// Whoops, drop the packet.
+	if( drop == -1 )
+		return drop;
 
 	// pull out the header.
 	// adjust the received size appropriately.

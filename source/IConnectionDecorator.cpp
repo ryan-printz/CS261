@@ -51,7 +51,7 @@ bool IConnectionDecorator::connected() const
 	return m_decorate->connected();
 }
 
-int IConnectionDecorator::receive(ubyte * buffer, uint len)
+int IConnectionDecorator::receive(ubyte * buffer, uint len, int drop)
 {
 	return m_decorate->receive(buffer, len);
 }

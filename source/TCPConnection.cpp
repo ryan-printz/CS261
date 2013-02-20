@@ -39,12 +39,17 @@ bool TCPConnection::connected() const
 	return m_connection.connected();
 }
 
-int TCPConnection::receive(ubyte * buffer, uint bufferlen)
+int TCPConnection::receive(ubyte * buffer, uint bufferlen, int drop)
 {
 	if( m_connection.invalid() ) 
 		return -1;
 
-	return m_connection.receive(buffer, bufferlen);
+	int temp = m_connection.receive(buffer, bufferlen);
+	//Ignores the TCP packet if drop decorator is on. For testing
+	if( drop == -1 )
+		return drop;
+	else
+		return temp;
 }
 
 int TCPConnection::send(ubyte * buffer, uint bufferlen, ubyte)

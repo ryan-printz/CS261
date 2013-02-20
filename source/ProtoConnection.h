@@ -187,7 +187,7 @@ public:
 
 	virtual bool connected() const;
 
-	virtual int receive(ubyte * buffer, uint len);
+	virtual int receive(ubyte * buffer, uint len, int drop = 0);
 	virtual int send(ubyte * buffer, uint len, ubyte flags = ProtoHeader::PROTO_NORMAL);
 	virtual void update(float dt);
 
