@@ -120,8 +120,10 @@ int ConnectionManager::Receive (unsigned char * buffer, unsigned bufferLen, HSes
 		result = connectionItr->second->receive(buffer, bufferLen);
 
         if (result != 0 && result != -1)
+		{
 			sessionOut = connectionItr->first;
             break;
+		}
     }
 
     return result;
