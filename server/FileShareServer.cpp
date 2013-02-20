@@ -145,10 +145,11 @@ void FileShareServer::AddFileToShare (const FileShareEvent & e, HSession session
 //******************************************************************************
 void FileShareServer::SendFileList (HSession session) {
 
+	std::string toSend("*******File list begin*******\n");
     PrintStringEvent e;
-    e.string = "*******File list begin*******";
-    e.stringSize = strlen(e.string) + 1;
-    m_engine.Send(e, session);
+    //e.string = "*******File list begin*******";
+    //e.stringSize = strlen(e.string) + 1;
+    //m_engine.Send(e, session);
 
     auto sessionItr = m_sessionList.begin();
     for (; sessionItr != m_sessionList.end(); ++sessionItr) {
@@ -156,28 +157,40 @@ void FileShareServer::SendFileList (HSession session) {
             //continue;
 
 		char sessionIdBuff[256];
-		itoa((int)session, sessionIdBuff, 10);
+		itoa((int)(sessionItr->first), sessionIdBuff, 10);
 
-		std::string sessionIdString;
-		sessionIdString.append("SessionId: ");
-		sessionIdString.append(sessionIdBuff);
-		PrintStringEvent sessionId;
-		sessionId.string = sessionIdString.c_str();
-		sessionId.stringSize = sessionIdString.size() + 1;
-		m_engine.Send(sessionId, session);
+		//std::string sessionIdString;
+		//sessionIdString.append("SessionId: ");
+		//sessionIdString.append(sessionIdBuff);
+		//PrintStringEvent sessionId;
+		//sessionId.string = sessionIdString.c_str();
+		//sessionId.stringSize = sessionIdString.size() + 1;
+		//m_engine.Send(sessionId, session);
+
+		toSend.append("SessionId: ");
+		toSend.append(sessionIdBuff);
+		toSend.append("\n");
 
         auto fileArray = sessionItr->second;
         auto fileItr = fileArray.begin();
 		++fileItr; // first element is user's ip & udp listen port.
         for (; fileItr != fileArray.end(); ++fileItr) {
-            e.string = fileItr->c_str();
-            e.stringSize = fileItr->size() + 1;
-            m_engine.Send(e, session);
+            //e.string = fileItr->c_str();
+            //e.stringSize = fileItr->size() + 1;
+            //m_engine.Send(e, session);
+			toSend.append(fileItr->c_str());
+			toSend.append("\n");
         }
     }
+	
 
-	e.string = "*******File list end*******\n";
-    e.stringSize = strlen(e.string) + 1;
+	//e.string = "*******File list end*******\n";
+    //e.stringSize = strlen(e.string) + 1;
+
+	toSend.append("*******File list end*******\n");
+
+	e.string = toSend.c_str();
+	e.stringSize = toSend.size() + 1;
     m_engine.Send(e, session);
 }
 
