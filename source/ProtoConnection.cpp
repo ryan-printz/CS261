@@ -2,6 +2,8 @@
 #include "SequenceNumber.h"
 
 #include <sstream>
+#include <iostream>
+#include <bitset>
 
 const static uint CONNECTION_MESSAGE = 0x5e015d13;
 const static uint KEEP_ALIVE_MESSAGE = 0x1d5e03e7;
@@ -117,6 +119,13 @@ int ProtoConnection::noFlowSend(ubyte * buffer, uint len, ubyte flags)
 	if( m_socket->send(packet, len + sizeof(ProtoHeader), &m_connection) != len + sizeof(ProtoHeader) )
 		return 0;
 	printf("Sending!\n");
+	//printf("Packet Header: Sequence number %d, Ack %d, Acks %d, Flags %c\n", header.m_acks, header.m_flags);
+	std::cout << "Packet Header: Sequence number " << header.m_sequence.m_sequenceNumber
+	<< ", Ack " << header.m_ack.m_sequenceNumber
+	<< ", Acks " << header.m_acks
+	<< ", Flags ";
+	std::cout << std::bitset<CHAR_BIT>(header.m_flags) << std::endl;
+	
 	if( flags & ProtoHeader::PROTO_HIGH )
 	{
 		ResendPacket repack;
@@ -174,6 +183,13 @@ int ProtoConnection::receive(ubyte * buffer, uint len, int drop)
 	// adjust the received size appropriately.
 	ProtoHeader * header = reinterpret_cast<ProtoHeader*>(packet);
 	received -= headerSize;
+
+	std::cout << "Received!" << std::endl;
+	std::cout << "Packet Header: Sequence number " << header->m_sequence.m_sequenceNumber
+	<< ", Ack " << header->m_ack.m_sequenceNumber
+	<< ", Acks " << header->m_acks
+	<< ", Flags ";
+	std::cout << std::bitset<CHAR_BIT>(header->m_flags) << std::endl;
 
 	m_idleTimer = 0.0f;
 	++m_stats.m_receivedPackets;
@@ -283,7 +299,7 @@ void ProtoConnection::updateFlowControl(float dt)
 		noFlowSend(m_flowControl.back().m_buffer, m_flowControl.back().m_size, m_flowControl.back().m_flags);
 		m_flowControl.pop_back();
 
-		m_flowTimer -= 1.0f/m_sendRate;
+		m_flowTimer -= (1.0f/m_sendRate) / 1000.f;
 	}
 }
 
