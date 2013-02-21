@@ -25,6 +25,7 @@ ProtoConnection::ProtoConnection()
 
 	m_penaltyTimer = 4.0f;
 	m_sendRate = 0.01f;
+	m_flowTimer = 0.f;
 }
 
 // socket and the destination ip:port pair.
@@ -115,7 +116,7 @@ int ProtoConnection::noFlowSend(ubyte * buffer, uint len, ubyte flags)
 
 	if( m_socket->send(packet, len + sizeof(ProtoHeader), &m_connection) != len + sizeof(ProtoHeader) )
 		return 0;
-
+	printf("Sending!\n");
 	if( flags & ProtoHeader::PROTO_HIGH )
 	{
 		ResendPacket repack;
@@ -277,7 +278,7 @@ void ProtoConnection::updateFlowControl(float dt)
 		}
 	}
 
-	while( m_flowTimer > 1.0f / m_sendRate && !m_flowControl.empty() )
+	while( m_flowTimer > (1.0f / m_sendRate) / 1000.f && !m_flowControl.empty() )
 	{
 		noFlowSend(m_flowControl.back().m_buffer, m_flowControl.back().m_size, m_flowControl.back().m_flags);
 		m_flowControl.pop_back();
