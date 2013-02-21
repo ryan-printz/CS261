@@ -40,9 +40,11 @@ bool ProtoConnection::accept(Socket * socket)
 	m_socket = socket;
 
 	uint connectionMessage = 0;
-	if( receive((ubyte*)&connectionMessage, sizeof(uint)) < sizeof(uint) 
-		|| connectionMessage != CONNECTION_MESSAGE )
+	int test = receive((ubyte*)&connectionMessage, sizeof(uint));
+
+	if( test < sizeof(uint)  || connectionMessage != CONNECTION_MESSAGE)
 		return false;
+	
 
 	m_server = true;
 	m_connected = true;
@@ -239,7 +241,7 @@ int ProtoConnection::receive(ubyte * buffer, uint len, int drop)
 			return 0;
 		}
 
-	memcpy(buffer, packet + headerSize, received);
+	memcpy(buffer, packet + headerSize, len);
 
 	return received;
 }

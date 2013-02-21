@@ -253,7 +253,7 @@ bool FileShareClient::Initialize () {
         m_engine.Send(e, m_tcpServer);
     }
 
-    if (!m_engine.ToggleListenTcp(atoi(udpListenPort)))
+    if (!m_engine.ToggleListenUdp(atoi(udpListenPort)))
         return false;
 
     if (!StartInputThread())
