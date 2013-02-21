@@ -360,7 +360,7 @@ void FileShareClient::UpdateTransferSession (TransferSession & tSession) {
 
 //******************************************************************************
 void FileShareClient::InitiateFileTransfer (const FileHostInfoEvent & e) {
-    HSession fileHost = m_engine.ConnectTcp(e.hostIp, e.hostPort);
+    HSession fileHost = m_engine.ConnectUdp(e.hostIp, e.hostPort);
 
     if (fileHost == nullptr) {
         printf("Unable to connect to host %s:%u.\n", e.hostIp, e.hostPort);
