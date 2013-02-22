@@ -253,7 +253,7 @@ bool FileShareClient::Initialize () {
         m_engine.Send(e, m_tcpServer);
     }
 
-    if (!m_engine.ToggleListenUdp(atoi(udpListenPort)))
+    if (!m_engine.ToggleListenTcp(atoi(udpListenPort)))
         return false;
 
     if (!StartInputThread())
@@ -360,7 +360,7 @@ void FileShareClient::UpdateTransferSession (TransferSession & tSession) {
 
 //******************************************************************************
 void FileShareClient::InitiateFileTransfer (const FileHostInfoEvent & e) {
-    HSession fileHost = m_engine.ConnectUdp(e.hostIp, e.hostPort);
+    HSession fileHost = m_engine.ConnectTcp(e.hostIp, e.hostPort);
 
     if (fileHost == nullptr) {
         printf("Unable to connect to host %s:%u.\n", e.hostIp, e.hostPort);

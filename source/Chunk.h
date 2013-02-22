@@ -2,7 +2,7 @@
 
 #include <vector>
 
-const int c_MaxPacketSize = 512;
+const int c_MaxPacketSize = 256;
 
 class Chunk {
 public:

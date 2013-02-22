@@ -16,7 +16,7 @@ std::vector<char> Chunk::GetNextPacket( void )
     int packetSize = 0;
 
     if ( (m_Array.size() - (m_CurrentPacket*c_MaxPacketSize)) < c_MaxPacketSize )
-        packetSize = m_Array.size();
+        packetSize = m_Array.size() - (m_CurrentPacket*c_MaxPacketSize);
 
     else
         packetSize = c_MaxPacketSize;
