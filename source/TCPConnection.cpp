@@ -43,8 +43,11 @@ int TCPConnection::receive(ubyte * buffer, uint bufferlen, int drop)
 {
 	if( m_connection.invalid() ) 
 		return -1;
+	uint size;
 
-	int temp = m_connection.receive(buffer, bufferlen);
+	int temp = m_connection.receive((ubyte*)&size, sizeof(uint));
+	if(temp)
+		temp = m_connection.receive(buffer, size);
 	//Ignores the TCP packet if drop decorator is on. For testing
 	if( drop == -1 )
 		return drop;

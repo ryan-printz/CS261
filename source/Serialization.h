@@ -20,8 +20,8 @@ public:
 	{
         CreatePackBuffer(E, buffer, bufferLen);
 
-        ubyte * buf = *buffer;
-
+        ubyte * buf = (*buffer) + 4;
+		**(int**)buffer = bufferLen;
 		ubyte * current = (ubyte*)(&E);
 	
 		for(int i = 0; E.def[i] != TYPE_END; ++i)
@@ -46,6 +46,7 @@ public:
 				break;
 			}
 		}
+		bufferLen += 4;
 	}
 
 	template <typename T>
@@ -113,7 +114,7 @@ private:
         unsigned paddingBytes = sizeof(void*) - (bufferLen % sizeof(void*));
         bufferLen += paddingBytes;
         
-        (*buffer) = new ubyte[bufferLen];
+        (*buffer) = new ubyte[bufferLen + 4];
     }
 	static int m_sizeArray[];
 };

@@ -121,6 +121,7 @@ int ConnectionManager::Receive (unsigned char * buffer, unsigned bufferLen, HSes
 
         if (result != 0 && result != -1)
 		{
+			printf("%d bytes received\n", result);
 			sessionOut = connectionItr->first;
             break;
 		}

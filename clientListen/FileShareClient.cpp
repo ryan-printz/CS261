@@ -51,7 +51,7 @@ void ReceiveEventCallback (HSession session, ubyte * data) {
             printf("%s \n", e.string);
         } break;
 
-       
+
     case FILESHARE_EVENT:
         {
             FileShareEvent e;
