@@ -42,6 +42,7 @@ void FileFrame::LoadChunk(std::string& filename )
     }
     fclose(loader);
     ++m_CurrentChunk;
+	this->m_Chunk.m_CurrentPacket = -1;
 }
 
 void FileFrame::WriteChunk(std::string & filename )

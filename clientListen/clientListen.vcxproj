@@ -81,9 +81,9 @@
     <ClCompile Include="FileShareClient.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\client\FileShareClient.h" />
     <ClInclude Include="..\source\FileShareEvents.h" />
     <ClInclude Include="..\source\Utils.hpp" />
+    <ClInclude Include="FileShareClient.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

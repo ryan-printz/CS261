@@ -278,13 +278,38 @@ bool FileShareClient::Update () {
     if (commandBuffer.size() != 0) {
         HandleInputCommand(commandBuffer);
     }
-
+	int temp = m_transferSessions.size();
     // update transfer sessions
     auto tSession = m_transferSessions.begin();
-
-    for (; tSession != m_transferSessions.end(); ++tSession) {
-        UpdateTransferSession(*tSession);
+	auto tTemp= tSession;
+    for (; tSession != m_transferSessions.end(); ++tSession) 
+	{
+		if(!UpdateTransferSession(*tSession))
+		{
+			if(m_transferSessions.size() == 1)
+			{
+				m_transferSessions.clear();
+				break;
+			}
+			
+			if(tSession == m_transferSessions.begin())
+			{
+				while(tSession != m_transferSessions.end() && !UpdateTransferSession(*tSession))
+				{
+					m_transferSessions.erase(m_transferSessions.begin());
+					tSession = m_transferSessions.begin();
+				}
+			}
+			else
+			{
+				tTemp = tSession;
+				--tTemp;
+				m_transferSessions.erase(tSession);
+				tSession = tTemp;
+			}
+		}
     }
+
 
 
     // update engine
@@ -294,10 +319,10 @@ bool FileShareClient::Update () {
 }
 
 //******************************************************************************
-void FileShareClient::UpdateTransferSession (TransferSession & tSession) {
+bool FileShareClient::UpdateTransferSession (TransferSession & tSession) {
     // no need to update if receiving
     if (!tSession.m_isSender)
-        return;
+        return true;
 
     FileFrame * fileFrame = &tSession.m_fileFrame;
     Chunk * chunk = &fileFrame->m_Chunk;
@@ -305,7 +330,7 @@ void FileShareClient::UpdateTransferSession (TransferSession & tSession) {
     if (!fileFrame->m_Ready) {
 
         if (!tSession.m_waitTimer.Update(m_timer.GetFrameTime()))
-            return;
+            return true;
 
         //if (++tSession.m_waitCount > m_maxWaitCount)
             // Close connection
@@ -318,7 +343,7 @@ void FileShareClient::UpdateTransferSession (TransferSession & tSession) {
             e.totalChunks = tSession.m_fileFrame.m_TotalChunks;
 
             m_engine.Send(e, tSession.m_session);
-            return;
+            return true;
         }
 
         NewChunkInfoEvent e;
@@ -328,7 +353,7 @@ void FileShareClient::UpdateTransferSession (TransferSession & tSession) {
         e.filename = tSession.m_filename.c_str();
         e.filenameSize = strlen(e.filename) + 1;
         m_engine.Send(e, tSession.m_session);
-        return;
+        return true;
     }
 
     // reset wait timers and variables
@@ -337,25 +362,32 @@ void FileShareClient::UpdateTransferSession (TransferSession & tSession) {
     if (chunk->IsComplete()) {
         if (fileFrame->IsFinalChunk()) {
             // we are done
-            return;
+            return false;
         }
         else {
-            fileFrame->LoadChunk(std::string(tSession.m_filename));
+			std::string filePath;
+			filePath.append(m_sharePath);
+			filePath.append(tSession.m_filename);
+            fileFrame->LoadChunk(filePath);
             fileFrame->m_Ready = false;
         }
     }
 
-    std::vector<char> data = chunk->GetNextPacket();
-    PacketEvent e;
-    e.filename = tSession.m_filename.c_str();
-    e.filenameSize = tSession.m_filename.size() + 1;
-    e.packetNum = chunk->m_CurrentPacket;
-    e.totalPackets = chunk->m_TotalPackets;
-    e.chunkNum = fileFrame->m_CurrentChunk;
-    e.packetSize = data.size();
-    e.data = &data.front();
+    std::vector<char> data;
+	chunk->GetNextPacket(data);
+	PacketEvent e;
+	e.filename = tSession.m_filename.c_str();
+	e.filenameSize = tSession.m_filename.size() + 1;
+	e.packetNum = chunk->m_CurrentPacket;
+	e.totalPackets = chunk->m_TotalPackets;
+	e.chunkNum = fileFrame->m_CurrentChunk;
+	e.packetSize = data.size();
+	e.data = &data.front();
 
-    m_engine.Send(e, tSession.m_session);
+	m_engine.Send(e, tSession.m_session);
+
+
+	return true;
 }
 
 //******************************************************************************

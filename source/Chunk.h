@@ -2,7 +2,7 @@
 
 #include <vector>
 
-const int c_MaxPacketSize = 256;
+const int c_MaxPacketSize = 512;
 
 class Chunk {
 public:
@@ -11,7 +11,7 @@ public:
 
   // Both Get & Insert increment m_CurrentPacket
   // do not call more than once per packet
-  std::vector<char> GetNextPacket( void );
+  void GetNextPacket(std::vector<char>& nextPacketcopy );
   void InsertPacket( std::vector<char>& new_packet, unsigned packetNum );
   std::vector<char> GetPacket( unsigned packetNum );
   int GetPacketId( void );

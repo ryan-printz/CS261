@@ -159,7 +159,7 @@ void Engine::Update (float dt) {
 
 
     // Receive events
-    const unsigned bufferLen = 512;
+    const unsigned bufferLen = 1024;
     unsigned char buffer[bufferLen];
 
     HSession session = nullptr;

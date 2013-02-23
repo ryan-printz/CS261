@@ -80,7 +80,7 @@
     <ClInclude Include="..\source\FileShareEvents.h">
       <Filter>Source Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\client\FileShareClient.h">
+    <ClInclude Include="FileShareClient.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

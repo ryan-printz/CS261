@@ -302,10 +302,10 @@ bool FileShareClient::Update () {
 }
 
 //******************************************************************************
-void FileShareClient::UpdateTransferSession (TransferSession & tSession) {
+bool FileShareClient::UpdateTransferSession (TransferSession & tSession) {
     // no need to update if receiving
     if (!tSession.m_isSender)
-        return;
+        return true;
 
     FileFrame * fileFrame = &tSession.m_fileFrame;
     Chunk * chunk = &fileFrame->m_Chunk;
@@ -313,7 +313,7 @@ void FileShareClient::UpdateTransferSession (TransferSession & tSession) {
     if (!fileFrame->m_Ready) {
 
         if (!tSession.m_waitTimer.Update(m_timer.GetFrameTime()))
-            return;
+            return true;
 
         //if (++tSession.m_waitCount > m_maxWaitCount)
             // Close connection
@@ -326,7 +326,7 @@ void FileShareClient::UpdateTransferSession (TransferSession & tSession) {
             e.totalChunks = tSession.m_fileFrame.m_TotalChunks;
 
             m_engine.Send(e, tSession.m_session);
-            return;
+            return true;
         }
 
         NewChunkInfoEvent e;
@@ -343,7 +343,7 @@ void FileShareClient::UpdateTransferSession (TransferSession & tSession) {
     if (chunk->IsComplete()) {
         if (fileFrame->IsFinalChunk()) {
             // we are done
-            return;
+            return false;
         }
         else {
             fileFrame->LoadChunk(std::string(tSession.m_filename));
@@ -351,7 +351,8 @@ void FileShareClient::UpdateTransferSession (TransferSession & tSession) {
         }
     }
 
-    std::vector<char> data = chunk->GetNextPacket();
+    std::vector<char> data; 
+	chunk->GetNextPacket(data);
     PacketEvent e;
     e.packetNum = chunk->m_CurrentPacket;
     e.totalPackets = chunk->m_TotalPackets;
@@ -360,6 +361,7 @@ void FileShareClient::UpdateTransferSession (TransferSession & tSession) {
     e.data = &data.front();
 
     m_engine.Send(e, tSession.m_session);
+	return true;
 }
 
 //******************************************************************************
@@ -426,7 +428,10 @@ void FileShareClient::InsertPacket (const PacketEvent & e, HSession session) {
         tSession->m_fileFrame.m_Chunk.InsertPacket(newPacket, e.packetNum);
 
 		if(e.packetNum == e.totalPackets - 1)
+		{
+			printf("Writing Chunk %d", tSession->m_fileFrame.m_CurrentChunk);
 			tSession->m_fileFrame.WriteChunk(std::string(e.filename, e.filenameSize));
+		}
     }
     else {
         //remove connection

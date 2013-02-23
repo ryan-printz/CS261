@@ -57,7 +57,7 @@ private:
     void HandleInputCommand (const std::string & command);
     void InitiateFileTransfer (const FileHostInfoEvent & e);
     void BeginFileTransfer (const char * filename, HSession session);
-    void UpdateTransferSession (TransferSession & tSession);
+    bool UpdateTransferSession (TransferSession & tSession);
 
 private:
     Engine m_engine;

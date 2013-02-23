@@ -10,25 +10,26 @@ Chunk::Chunk()
 Chunk::~Chunk()
 {}
 
-std::vector<char> Chunk::GetNextPacket( void )
+void Chunk::GetNextPacket( std::vector<char>& nextPacketcopy )
 {
     ++m_CurrentPacket;
     int packetSize = 0;
 
     if ( (m_Array.size() - (m_CurrentPacket*c_MaxPacketSize)) < c_MaxPacketSize )
+	{
         packetSize = m_Array.size() - (m_CurrentPacket*c_MaxPacketSize);
+	}
 
     else
         packetSize = c_MaxPacketSize;
 
-    std::vector<char> nextPacketcopy;
 
     for(int packetIt = 0; packetIt < packetSize; ++packetIt)
     {
         nextPacketcopy.push_back(m_Array[packetIt + (m_CurrentPacket*c_MaxPacketSize)]);  
     }
 
-    return nextPacketcopy;
+    //return nextPacketcopy;
 }
 
 std::vector<char> Chunk::GetPacket( unsigned packetNum ) {
