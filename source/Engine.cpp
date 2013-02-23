@@ -100,7 +100,8 @@ HSession Engine::ConnectUdp (const char * remoteIp, unsigned remotePort) {
 }
 
 //******************************************************************************
-bool Engine::ToggleListenTcp (unsigned port) {
+bool Engine::ToggleListenTcp (unsigned port) 
+{
     auto listItr = m_listenList.find(port);
 
     if (listItr != m_listenList.end()) {
@@ -128,7 +129,8 @@ const IConnectionInfo * Engine::GetConnectionsInfo() const
 }
 
 //******************************************************************************
-bool Engine::ToggleListenUdp (unsigned port) {
+bool Engine::ToggleListenUdp (unsigned port) 
+{
     auto listItr = m_listenList.find(port);
 
     if (listItr != m_listenList.end()) {

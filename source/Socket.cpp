@@ -30,6 +30,9 @@ Socket::Socket()
 	: m_isBlocking(true), m_isConnected(false), m_error(0), m_socket(INVALID_SOCKET)
 {}
 
+Socket::~Socket()
+{}
+
 char * Socket::localIP()
 {
 	// get the ip for localhost.

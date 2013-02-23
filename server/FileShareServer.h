@@ -29,7 +29,7 @@ public:
 
 private:
     void AddFileToShare (const FileShareEvent & e, HSession session);
-	void HandleFileHostInfoRequest(const GetFileHostInfoEvent & e, int id);
+	void HandleFileHostInfoRequest(const GetFileHostInfoEvent & e, HSession id);
     void SendFileList (HSession session);
 private:
     Engine m_engine;

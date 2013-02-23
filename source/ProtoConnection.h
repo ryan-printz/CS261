@@ -3,8 +3,7 @@
 #include "IConnection.h"
 #include "Socket.h"
 #include "SequenceNumber.h"
-#include "ProtoHeader.h"
-
+#include "ProtoSocket.h"
 #include <unordered_map>
 
 #include <list>

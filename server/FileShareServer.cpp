@@ -130,7 +130,7 @@ bool FileShareServer::ShutDown () {
 
 //******************************************************************************
 bool FileShareServer::Update () {
-    m_engine.Update(m_timer.Update());
+    m_engine.Update((float)m_timer.Update());
     return m_quit;
 }
 
@@ -154,7 +154,7 @@ void FileShareServer::SendFileList (HSession session) {
             continue;
 
 		char sessionIdBuff[256];
-		itoa((int)(sessionItr->first), sessionIdBuff, 10);
+		_itoa_s((int)(sessionItr->first), sessionIdBuff, 10);
 
 		toSend.append("SessionId: ");
 		toSend.append(sessionIdBuff);

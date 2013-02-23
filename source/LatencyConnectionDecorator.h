@@ -69,7 +69,7 @@ public:
 		std::stringstream info;
 		info << m_decorate->connectionInfo();
 		info << "Delay Decorator" << std::endl << "-----------------------" << std::endl;
-		info << "Delay packets by";
+		info << "Delay packets by ";
 
 		if( m_lowDelay )
 			info << m_lowDelay << "ms - ";

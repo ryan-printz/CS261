@@ -45,7 +45,7 @@ bool ProtoConnection::accept(Socket * socket)
 
 bool ProtoConnection::connect(const char * IP, uint port)
 {
-	m_connection.initializeProto(Socket::localIP, port, AF_INET);
+	m_connection.initializeProto(Socket::localIP(), port, AF_INET);
 	m_connection.connect();
 	m_connection.setBlocking(false);
 
@@ -149,22 +149,22 @@ int ProtoConnection::receive(ubyte * buffer, uint len, int drop)
 
 	// pull out the header.
 	// adjust the received size appropriately.
-	ProtoHeader * header = m_connection.getProtoHeader();
+	ProtoHeader header = m_connection.getProtoHeader();
 
 	std::cout << "Received!" << std::endl;
-	std::cout << "Packet Header: Sequence number " << header->m_sequence.m_sequenceNumber
-	<< ", Ack " << header->m_ack.m_sequenceNumber
-	<< ", Acks " << std::bitset<32>((int)header->m_acks) 
-	<< ", Flags " << std::bitset<CHAR_BIT>(header->m_flags) << std::endl;
+	std::cout << "Packet Header: Sequence number " << header.m_sequence.m_sequenceNumber
+	<< ", Ack " << header.m_ack.m_sequenceNumber
+	<< ", Acks " << std::bitset<32>((int)header.m_acks) 
+	<< ", Flags " << std::bitset<CHAR_BIT>(header.m_flags) << std::endl;
 
 	m_idleTimer = 0.0f;
 	++m_stats.m_receivedPackets;
 
 	// drop duplicate packets.
-	if( m_receivedPackets.has( header->m_sequence ) )
+	if( m_receivedPackets.has( header.m_sequence ) )
 		return -1;
 
-	if( header->m_flags & ProtoHeader::PROTO_RESENT )
+	if( header.m_flags & ProtoHeader::PROTO_RESENT )
 	{
 		SequenceNumber * old = reinterpret_cast<SequenceNumber*>(packet + headerSize);
 		received -= sizeof(SequenceNumber);
@@ -178,7 +178,7 @@ int ProtoConnection::receive(ubyte * buffer, uint len, int drop)
 	}
 
 	PacketInfo info;
-	info.m_sequence	= header->m_sequence;
+	info.m_sequence	= header.m_sequence;
 	info.m_time		= 0.0f;
 	info.m_size		= received;
 
@@ -186,11 +186,11 @@ int ProtoConnection::receive(ubyte * buffer, uint len, int drop)
 	m_receivedPackets.push_back( info );
 
 	// update the remote sequence number.
-	if( header->m_sequence > m_remote )
-		m_remote = header->m_sequence;
+	if( header.m_sequence > m_remote )
+		m_remote = header.m_sequence;
 
 	// check out what the packet ack'd
-	useAck(header->m_ack, header->m_acks, header->m_flags & ProtoHeader::PROTO_RESENT);
+	useAck(header.m_ack, header.m_acks, header.m_flags & ProtoHeader::PROTO_RESENT);
 
 	// don't return keep alive packets.
 	// handle disconnect messages.
@@ -348,7 +348,7 @@ std::string ProtoConnection::connectionInfo() const
 	info << "UDP Connection:";
 
 	if( m_connected )
-		info << " " << m_socket->ipAddress() << ":" << m_socket->port() << std::endl;
+		info << " " << m_connection.ipAddress() << ":" << m_connection.port() << std::endl;
 	else
 		info << " not connected.";
 
