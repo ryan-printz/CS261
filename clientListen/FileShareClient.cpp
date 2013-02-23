@@ -51,6 +51,14 @@ void ReceiveEventCallback (HSession session, ubyte * data) {
             printf("%s \n", e.string);
         } break;
 
+    case PACKET_EVENT:
+        {
+            PacketEvent e;
+            Packer p;
+            p.unpack(e, data);
+
+            s_client->InsertPacket(e, session);
+        } break;
 
     case FILESHARE_EVENT:
         {
@@ -59,7 +67,6 @@ void ReceiveEventCallback (HSession session, ubyte * data) {
             p.unpack(e, data);
             std::string filePath;
             filePath.append(s_client->m_sharePath);
-            const char * filename = e.filename;
             s_client->BeginFileTransfer(e.filename, session);
         } break;
 
@@ -83,6 +90,7 @@ void ReceiveEventCallback (HSession session, ubyte * data) {
                             fileFrame->m_Chunk.m_TotalPackets = e.numPackets;
                             fileFrame->m_Chunk.m_Array.clear();
                             fileFrame->m_Chunk.m_Array.resize(e.chunkSize);
+                            fileFrame->m_Chunk.m_InsertedArray.resize(e.chunkSize);
                         }
                         s_client->m_engine.Send(e, session);
                     }
@@ -278,10 +286,11 @@ bool FileShareClient::Update () {
     if (commandBuffer.size() != 0) {
         HandleInputCommand(commandBuffer);
     }
-	int temp = m_transferSessions.size();
+
     // update transfer sessions
     auto tSession = m_transferSessions.begin();
-	auto tTemp= tSession;
+
+    auto tTemp = tSession;
     for (; tSession != m_transferSessions.end(); ++tSession) 
 	{
 		if(!UpdateTransferSession(*tSession))
@@ -309,7 +318,6 @@ bool FileShareClient::Update () {
 			}
 		}
     }
-
 
 
     // update engine
@@ -352,7 +360,7 @@ bool FileShareClient::UpdateTransferSession (TransferSession & tSession) {
         e.numPackets = tSession.m_fileFrame.m_Chunk.m_TotalPackets;
         e.filename = tSession.m_filename.c_str();
         e.filenameSize = strlen(e.filename) + 1;
-        m_engine.Send(e, tSession.m_session);
+		m_engine.Send(e, tSession.m_session);
         return true;
     }
 
@@ -365,7 +373,7 @@ bool FileShareClient::UpdateTransferSession (TransferSession & tSession) {
             return false;
         }
         else {
-			std::string filePath;
+            std::string filePath;
 			filePath.append(m_sharePath);
 			filePath.append(tSession.m_filename);
             fileFrame->LoadChunk(filePath);
@@ -385,8 +393,6 @@ bool FileShareClient::UpdateTransferSession (TransferSession & tSession) {
 	e.data = &data.front();
 
 	m_engine.Send(e, tSession.m_session);
-
-
 	return true;
 }
 
@@ -428,6 +434,42 @@ void FileShareClient::BeginFileTransfer (const char * filename, HSession session
     m_engine.Send(e, session);
 }
 
+//******************************************************************************
+void FileShareClient::InsertPacket (const PacketEvent & e, HSession session) {
+    TransferSession temp(e.filename, session, false);
+
+    auto tSession = m_transferSessions.begin();
+    bool found = false;
+
+    for (; tSession != m_transferSessions.end(); ++tSession) {
+        if (*tSession == temp) {
+            found = true;
+            break;
+        }
+    }
+
+    if (found) {
+        if (tSession->m_fileFrame.m_Chunk.m_InsertedArray[e.packetNum])
+            return; // already have packet saved
+
+        std::vector<char> newPacket;
+        for (unsigned i = 0; i < e.packetSize; ++i) {
+            newPacket.push_back(e.data[i]);
+        }
+
+        tSession->m_fileFrame.m_Chunk.InsertPacket(newPacket, e.packetNum);
+
+		if(e.packetNum == e.totalPackets - 1)
+		{
+			printf("Writing Chunk %d", tSession->m_fileFrame.m_CurrentChunk);
+			tSession->m_fileFrame.WriteChunk(std::string(e.filename, e.filenameSize));
+		}
+    }
+    else {
+        //remove connection
+        return;
+    }
+}
 //******************************************************************************
 void FileShareClient::HandleInputCommand (const std::string & command) {
     // for now this just sends a print string, but we will change this to parse commands and switch

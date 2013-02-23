@@ -290,8 +290,33 @@ bool FileShareClient::Update () {
     // update transfer sessions
     auto tSession = m_transferSessions.begin();
 
-    for (; tSession != m_transferSessions.end(); ++tSession) {
-        UpdateTransferSession(*tSession);
+    auto tTemp = tSession;
+    for (; tSession != m_transferSessions.end(); ++tSession) 
+	{
+		if(!UpdateTransferSession(*tSession))
+		{
+			if(m_transferSessions.size() == 1)
+			{
+				m_transferSessions.clear();
+				break;
+			}
+			
+			if(tSession == m_transferSessions.begin())
+			{
+				while(tSession != m_transferSessions.end() && !UpdateTransferSession(*tSession))
+				{
+					m_transferSessions.erase(m_transferSessions.begin());
+					tSession = m_transferSessions.begin();
+				}
+			}
+			else
+			{
+				tTemp = tSession;
+				--tTemp;
+				m_transferSessions.erase(tSession);
+				tSession = tTemp;
+			}
+		}
     }
 
 
@@ -335,6 +360,8 @@ bool FileShareClient::UpdateTransferSession (TransferSession & tSession) {
         e.numPackets = tSession.m_fileFrame.m_Chunk.m_TotalPackets;
         e.filename = tSession.m_filename.c_str();
         e.filenameSize = strlen(e.filename) + 1;
+		m_engine.Send(e, tSession.m_session);
+        return true;
     }
 
     // reset wait timers and variables
@@ -346,21 +373,26 @@ bool FileShareClient::UpdateTransferSession (TransferSession & tSession) {
             return false;
         }
         else {
-            fileFrame->LoadChunk(std::string(tSession.m_filename));
+            std::string filePath;
+			filePath.append(m_sharePath);
+			filePath.append(tSession.m_filename);
+            fileFrame->LoadChunk(filePath);
             fileFrame->m_Ready = false;
         }
     }
 
-    std::vector<char> data; 
+    std::vector<char> data;
 	chunk->GetNextPacket(data);
-    PacketEvent e;
-    e.packetNum = chunk->m_CurrentPacket;
-    e.totalPackets = chunk->m_TotalPackets;
-    e.chunkNum = fileFrame->m_CurrentChunk;
-    e.packetSize = data.size();
-    e.data = &data.front();
+	PacketEvent e;
+	e.filename = tSession.m_filename.c_str();
+	e.filenameSize = tSession.m_filename.size() + 1;
+	e.packetNum = chunk->m_CurrentPacket;
+	e.totalPackets = chunk->m_TotalPackets;
+	e.chunkNum = fileFrame->m_CurrentChunk;
+	e.packetSize = data.size();
+	e.data = &data.front();
 
-    m_engine.Send(e, tSession.m_session);
+	m_engine.Send(e, tSession.m_session);
 	return true;
 }
 
