@@ -69,7 +69,7 @@
     <ClCompile Include="..\source\Utils.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="FileShareClient.cpp">
+    <ClCompile Include="FileShareServer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

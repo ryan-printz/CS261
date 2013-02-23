@@ -12,6 +12,7 @@ class Socket
 {
 public:
 	Socket();
+	virtual ~Socket();
 
 	static char * localIP();
 
@@ -39,7 +40,7 @@ public:
 
 	Socket accept();
 
-private:
+protected:
 	uint m_error;
 	bool m_isBlocking;
 	bool m_isConnected;

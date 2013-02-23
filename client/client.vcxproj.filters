@@ -116,6 +116,12 @@
     <ClInclude Include="..\source\LatencyConnectionDecorator.h">
       <Filter>headers</Filter>
     </ClInclude>
+    <ClInclude Include="..\source\ProtoSocket.h">
+      <Filter>headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\ProtoHeader.h">
+      <Filter>headers</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="headers">

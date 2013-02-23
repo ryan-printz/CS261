@@ -11,6 +11,7 @@
 #include "TCPConnection.h"
 #include "ProtoConnection.h"
 #include "Socket.h"
+#include "ProtoSocket.h"
 
 //******************************************************************************
 Listener::Listener (ListenType type, unsigned port) 
@@ -52,16 +53,14 @@ IConnection * Listener::Listen () {
     // this switch case, m_type, and a whole lot of shit here.
     switch (m_type) {
     case LISTEN_TCP:
-        {
-            bool success = m_connection->accept(m_socket);
-            if (success) {
-                newConnection = m_connection;
-                m_connection = new TCPConnection;
-            }
+        bool success = m_connection->accept(m_socket);
+        if (success) {
+            newConnection = m_connection;
+            m_connection = new TCPConnection;
         }
         break;
     case LISTEN_UDP:
-        bool success = reinterpret_cast<ProtoConnection *>(m_connection)->accept(m_socket);
+        bool success = m_connection->accept(m_socket);
         if (success) {
             newConnection = m_connection;
             m_connection = new ProtoConnection;
@@ -96,7 +95,7 @@ void Listener::InitializeTcp (unsigned port) {
 
 //******************************************************************************
 void Listener::InitializeUdp (unsigned port) {
-    m_socket = new Socket;
+    m_socket = new ProtoSocket;
     if (m_socket == nullptr) {
         printf("Listener: Failure allocating socket.");
         return;
@@ -109,7 +108,8 @@ void Listener::InitializeUdp (unsigned port) {
         return;
     }
 
-    m_socket->initializeUDP(Socket::localIP(), port);
+    reinterpret_cast<ProtoSocket*>(m_socket)->initializeProto(Socket::localIP(), port);
     m_socket->bind();
     m_socket->setBlocking(false);
+	m_socket->listen();
 }

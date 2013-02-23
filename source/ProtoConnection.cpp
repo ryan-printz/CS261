@@ -1,16 +1,12 @@
 #include "ProtoConnection.h"
 #include "SequenceNumber.h"
-
+#include "ProtoSocket.h"
 #include <sstream>
 #include <iostream>
 #include <bitset>
 
-const static uint CONNECTION_MESSAGE = 0x5e015d13;
-const static uint KEEP_ALIVE_MESSAGE = 0x1d5e03e7;
-const static uint DISCONNECT_MESSAGE = 0xf70f8c3b;
-
 ProtoConnection::ProtoConnection()
-	: m_socket(nullptr), m_connected(false), m_useFlowControl(true), m_local(1)
+	: m_connected(false), m_useFlowControl(true), m_local(1)
 {
 	m_stats.m_ackedPackets = m_stats.m_lostPackets 
 						   = m_stats.m_receivedPackets 
@@ -34,57 +30,36 @@ ProtoConnection::ProtoConnection()
 // the socket should be bound on the server end.
 bool ProtoConnection::accept(Socket * socket)
 {
-	if( m_connected )
+	ProtoSocket * plistener = dynamic_cast<ProtoSocket*>(socket);
+
+	if( !plistener )
 		return false;
 
-	m_socket = socket;
+	ProtoSocket accepted = plistener->acceptProto();
 
-	uint connectionMessage = 0;
-	int test = receive((ubyte*)&connectionMessage, sizeof(uint));
-
-	if( test < sizeof(uint)  || connectionMessage != CONNECTION_MESSAGE)
-		return false;
-	
-
-	m_server = true;
-	m_connected = true;
+	if( !accepted.invalid() )
+		m_connection = accepted;
 
 	return true;
 }
 
 bool ProtoConnection::connect(const char * IP, uint port)
 {
-	m_socket = new Socket();
-
-	m_socket->initializeUDP(Socket::localIP(), port, AF_INET);
-	m_socket->setBlocking(false);
-
-	m_connection.sin_family = AF_INET;
-	m_connection.sin_port = htons(port);
-	m_connection.sin_addr.s_addr = inet_addr(IP);
-
-	m_server = false;
-	m_connected = true;
-	
-	send((ubyte*)&CONNECTION_MESSAGE, sizeof(uint));
+	m_connection.initializeProto(Socket::localIP, port, AF_INET);
+	m_connection.connect();
+	m_connection.setBlocking(false);
 
 	return true;
 }
 
 bool ProtoConnection::disconnect()
 {
-	send((ubyte*)&DISCONNECT_MESSAGE, sizeof(uint));
+	send((ubyte*)&ProtoHeader::DISCONNECT_MESSAGE, sizeof(uint));
 	return true;
 }
 
 bool ProtoConnection::cleanup()
 {
-	if( !m_server ) 
-	{
-		m_socket->cleanUp();
-		delete m_socket;
-	}
-
 	return true;
 }
 
@@ -107,7 +82,7 @@ int ProtoConnection::send(ubyte * buffer, uint len, ubyte flags)
 // send a packet to the "connected" 
 int ProtoConnection::noFlowSend(ubyte * buffer, uint len, ubyte flags)
 {
-	ubyte packet[256];
+	ubyte packet[ProtoSocket::MAX_PACKET_SIZE];
 
 	ProtoHeader header;
 	header.m_sequence = m_local;
@@ -115,18 +90,17 @@ int ProtoConnection::noFlowSend(ubyte * buffer, uint len, ubyte flags)
 	header.m_acks	  = makeAck();
 	header.m_flags	  = flags;
 
-	memcpy( packet, &header, sizeof(ProtoHeader) );
-	memcpy( packet + sizeof(ProtoHeader), buffer, len );
+	m_connection.setProtoHeader(&header);
 
-	if( m_socket->send(packet, len + sizeof(ProtoHeader), &m_connection) != len + sizeof(ProtoHeader) )
-		return 0;
-	printf("Sending!\n");
-	//printf("Packet Header: Sequence number %d, Ack %d, Acks %d, Flags %c\n", header.m_acks, header.m_flags);
+	int sent = 0;
+
+	if((sent = m_connection.send(packet, len)) != len )
+		return -1;
+
 	std::cout << "Packet Header: Sequence number " << header.m_sequence.m_sequenceNumber
 	<< ", Ack " << header.m_ack.m_sequenceNumber
-	<< ", Acks " << header.m_acks
-	<< ", Flags ";
-	std::cout << std::bitset<CHAR_BIT>(header.m_flags) << std::endl;
+	<< ", Acks " << std::bitset<32>((int)header.m_acks) 
+	<< ", Flags " << std::bitset<CHAR_BIT>(header.m_flags) << std::endl;
 	
 	if( flags & ProtoHeader::PROTO_HIGH )
 	{
@@ -153,29 +127,21 @@ int ProtoConnection::noFlowSend(ubyte * buffer, uint len, ubyte flags)
 	++m_local;
 	++m_stats.m_sentPackets;
 
-	return len;
+	return sent;
 }
 
 // receives a datagram.
 int ProtoConnection::receive(ubyte * buffer, uint len, int drop)
 {
-	ubyte packet[256];
+	ubyte packet[ProtoSocket::MAX_PACKET_SIZE];
 	uint headerSize = sizeof(ProtoHeader);
 
-	NetAddress from;
-	int received = m_socket->receive(packet, 256, &from);
+	int received = m_connection.receive(packet, 256);
 
 	// no packet was received
 	// or the packet was not from this protocol.
-	if( received == -1 || !reinterpret_cast<ProtoHeader*>(packet)->valid() )
+	if( received == -1 )
 		return -1;
-
-	// lost connection.
-	else if( received == 0 )
-	{
-		m_connected = false;
-		return 0;
-	}
 
 	// Whoops, drop the packet.
 	if( drop == -1 )
@@ -183,15 +149,13 @@ int ProtoConnection::receive(ubyte * buffer, uint len, int drop)
 
 	// pull out the header.
 	// adjust the received size appropriately.
-	ProtoHeader * header = reinterpret_cast<ProtoHeader*>(packet);
-	received -= headerSize;
+	ProtoHeader * header = m_connection.getProtoHeader();
 
 	std::cout << "Received!" << std::endl;
 	std::cout << "Packet Header: Sequence number " << header->m_sequence.m_sequenceNumber
 	<< ", Ack " << header->m_ack.m_sequenceNumber
-	<< ", Acks " << header->m_acks
-	<< ", Flags ";
-	std::cout << std::bitset<CHAR_BIT>(header->m_flags) << std::endl;
+	<< ", Acks " << std::bitset<32>((int)header->m_acks) 
+	<< ", Flags " << std::bitset<CHAR_BIT>(header->m_flags) << std::endl;
 
 	m_idleTimer = 0.0f;
 	++m_stats.m_receivedPackets;
@@ -230,18 +194,10 @@ int ProtoConnection::receive(ubyte * buffer, uint len, int drop)
 
 	// don't return keep alive packets.
 	// handle disconnect messages.
-	if( received == sizeof(uint) )
-		if( *(uint*)(packet + headerSize) == KEEP_ALIVE_MESSAGE )
-		{
-			return -1;
-		}
-		else if( *(uint*)(packet + headerSize) == DISCONNECT_MESSAGE )
-		{
-			m_connected = false;
-			return 0;
-		}
+	if( received == sizeof(uint) && *(uint*)(packet + headerSize) == ProtoHeader::KEEP_ALIVE_MESSAGE )
+		return -1;
 
-	memcpy(buffer, packet + headerSize, len);
+	memcpy(buffer, packet + headerSize + sizeof(uint), received -= sizeof(uint));
 
 	return received;
 }
@@ -312,7 +268,7 @@ void ProtoConnection::update(float dt)
 
 	if( m_keepAliveInterval && !((int)m_idleTimer % m_keepAliveInterval) )
 	{
-		send((ubyte*)&KEEP_ALIVE_MESSAGE, sizeof(uint));
+		send((ubyte*)&ProtoHeader::KEEP_ALIVE_MESSAGE, sizeof(uint));
 	}
 
 	if( m_timeout && m_idleTimer > m_timeout )
@@ -494,9 +450,9 @@ std::ostream & operator<<(std::ostream & os, const ConnectionStats & stats)
 
 bool operator==(const FlowPacket &lhs, const FlowPacket &rhs)
 {
-	const ubyte highlownorm = ProtoConnection::ProtoHeader::PROTO_HIGH |
-							   ProtoConnection::ProtoHeader::PROTO_LOW | 
-							   ProtoConnection::ProtoHeader::PROTO_NORMAL;
+	const ubyte highlownorm = ProtoHeader::PROTO_HIGH |
+							  ProtoHeader::PROTO_LOW | 
+							  ProtoHeader::PROTO_NORMAL;
 	ubyte priority = lhs.m_flags & rhs.m_flags;
 	return priority & highlownorm ? true : false;
 }
@@ -511,8 +467,8 @@ bool operator >(const FlowPacket &lhs, const FlowPacket &rhs)
 	// lhs has greater priority iff:
 	// lhs is high priority && rhs is NOT high priority.
 	// lhs is NOT low priority && rhs is low priority.
-	return ((lhs.m_flags & ProtoConnection::ProtoHeader::PROTO_HIGH) && !(rhs.m_flags & ProtoConnection::ProtoHeader::PROTO_HIGH))
-		|| (!(lhs.m_flags & ProtoConnection::ProtoHeader::PROTO_LOW) && (rhs.m_flags & ProtoConnection::ProtoHeader::PROTO_LOW));
+	return ((lhs.m_flags & ProtoHeader::PROTO_HIGH) && !(rhs.m_flags & ProtoHeader::PROTO_HIGH))
+		|| (!(lhs.m_flags & ProtoHeader::PROTO_LOW) && (rhs.m_flags & ProtoHeader::PROTO_LOW));
 }
 
 bool operator <(const FlowPacket &lhs, const FlowPacket &rhs)

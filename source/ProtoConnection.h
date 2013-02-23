@@ -3,6 +3,7 @@
 #include "IConnection.h"
 #include "Socket.h"
 #include "SequenceNumber.h"
+#include "ProtoHeader.h"
 
 #include <unordered_map>
 
@@ -154,30 +155,6 @@ std::ostream & operator<<(std::ostream & os, const ConnectionStats & stats);
 class ProtoConnection : public IConnection
 {
 public: 
-	struct ProtoHeader
-	{
-		enum Flags
-		{
-			PROTO_RESENT = 0x01,
-
-			PROTO_HIGH	 = 0x80,
-			PROTO_NORMAL = 0x40,
-			PROTO_LOW	 = 0x20
-		};
-
-		// a constant identifier for the protocol.
-		// packets that don't have this are ignored.
-		ProtoHeader() : m_protocol(0xb4639620) {}
-		const uint		m_protocol;
-
-		SequenceNumber	m_sequence;
-		SequenceNumber	m_ack;
-		uint			m_acks;
-		byte			m_flags;
-
-		bool valid() { return m_protocol == 0xb4639620; };
-	};
-
 	ProtoConnection();
 
 	virtual bool accept(Socket * open);
@@ -208,8 +185,7 @@ protected:
 
 private:
 	// the other receiving endpoint.
-	Socket * m_socket;
-	NetAddress m_connection;
+	ProtoSocket m_connection;
 
 	// connection properties
 	bool m_connected;

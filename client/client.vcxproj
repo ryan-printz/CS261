@@ -90,6 +90,8 @@
     <ClInclude Include="..\source\LatencyConnectionDecorator.h" />
     <ClInclude Include="..\source\Listener.h" />
     <ClInclude Include="..\source\ProtoConnection.h" />
+    <ClInclude Include="..\source\ProtoHeader.h" />
+    <ClInclude Include="..\source\ProtoSocket.h" />
     <ClInclude Include="..\source\SequenceNumber.h" />
     <ClInclude Include="..\source\Serialization.h" />
     <ClInclude Include="..\source\Socket.h" />

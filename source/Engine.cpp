@@ -154,7 +154,7 @@ void Engine::Update (float dt) {
     // Listen & Accept new connections
     Listen();
 
-    // Update connections
+    // Update connections;
     m_connectionManager->Update(dt);
 
 

@@ -78,7 +78,7 @@
     <ClCompile Include="..\source\TCPConnection.cpp" />
     <ClCompile Include="..\source\Timer.cpp" />
     <ClCompile Include="..\source\Utils.cpp" />
-    <ClCompile Include="FileShareClient.cpp" />
+    <ClCompile Include="FileShareServer.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\source\FileShareEvents.h" />
