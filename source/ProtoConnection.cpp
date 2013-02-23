@@ -40,7 +40,7 @@ bool ProtoConnection::accept(Socket * socket)
 	if( !accepted.invalid() )
 		m_connection = accepted;
 
-	return true;
+	return !accepted.invalid();
 }
 
 bool ProtoConnection::connect(const char * IP, uint port)

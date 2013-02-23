@@ -232,7 +232,6 @@ bool FileShareClient::Initialize () {
     stream.getline( directoryBuffer, MAX_PATH );
     m_sharePath = std::string(directoryBuffer);
 
-
     stream.close();
 
     // connect to tcp server

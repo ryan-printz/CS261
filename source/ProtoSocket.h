@@ -19,6 +19,10 @@ public:
 public:
 	ProtoSocket & operator = (const ProtoSocket & lhs)
 	{
+		delete m_connectionAttempts;
+		delete m_disconnected;
+		delete m_received;
+
 		m_packetSize			= lhs.m_packetSize;
 		m_isInitialized			= lhs.m_isInitialized;
 		m_connectionAttempts	= lhs.m_connectionAttempts;
@@ -66,6 +70,8 @@ public:
 	ProtoSocket acceptProto()
 	{
 		ProtoSocket accepted;
+
+		receiveSort();
 
 		if( m_connectionAttempts->empty() )
 			return accepted;
@@ -161,7 +167,7 @@ private:
 	{
 		Packet p;
 
-		p.packetSize = receive(p.packet, m_packetSize, &p.from);
+		p.packetSize = Socket::receive(p.packet, m_packetSize, &p.from);
 
 		// nothing to receive
 		if( p.packetSize == SOCKET_ERROR && m_error == WSAEWOULDBLOCK )
