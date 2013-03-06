@@ -101,7 +101,7 @@ int ProtoSocket::send(ubyte * buffer, uint len, const NetAddress * address)
 {
 	ubyte packet[MAX_PACKET_SIZE];
 
-	memcpy(packet, &m_header, sizeof(ProtoHeader));
+	memcpy(packet, m_header, sizeof(ProtoHeader));
 	memcpy(packet + sizeof(ProtoHeader), buffer, std::min(len, MAX_PACKET_SIZE - sizeof(ProtoHeader)));
 
 	return Socket::send(packet, std::min(len+sizeof(ProtoHeader), MAX_PACKET_SIZE), address) - sizeof(ProtoHeader);
@@ -182,7 +182,7 @@ void ProtoSocket::receiveSort()
 
 	// connection attempt
 	else if ( p.packetSize - sizeof(ProtoHeader) == sizeof(uint) 
-			&& ProtoHeader::CONNECTION_MESSAGE == *(p.packet + sizeof(ProtoHeader)) )
+			&& ProtoHeader::CONNECTION_MESSAGE == *((uint*)(p.packet + sizeof(ProtoHeader))) )
 	{
 		m_connectionAttempts.emplace_back(p.from);
 		return;
@@ -190,7 +190,7 @@ void ProtoSocket::receiveSort()
 
 	// disconnection
 	else if ( p.packetSize - sizeof(ProtoHeader) == sizeof(uint) 
-			&& ProtoHeader::DISCONNECT_MESSAGE == *(p.packet + sizeof(ProtoHeader)) )
+			&& ProtoHeader::DISCONNECT_MESSAGE == *((uint*)(p.packet + sizeof(ProtoHeader))) )
 	{
 		m_disconnected.emplace_back(p.from);
 		return;

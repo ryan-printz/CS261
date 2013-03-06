@@ -141,7 +141,7 @@ int ProtoConnection::receive(ubyte * buffer, uint len, int drop)
 	ubyte packet[ProtoSocket::MAX_PACKET_SIZE];
 	uint headerSize = sizeof(ProtoHeader);
 
-	int received = m_connection.receive(packet, 256);
+	int received = m_connection.receive(packet, ProtoSocket::MAX_PACKET_SIZE);
 
 	// no packet was received
 	// or the packet was not from this protocol.
