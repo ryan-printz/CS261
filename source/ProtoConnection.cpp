@@ -48,9 +48,13 @@ bool ProtoConnection::accept(Socket * socket)
 
 bool ProtoConnection::connect(const char * IP, uint port)
 {
-	m_connection.initializeProto(IP, port, AF_INET);
-	m_connection.connect();
-	m_connection.setBlocking(false);
+	if(!m_connection.initializeProto(Socket::localIP(), port, AF_INET))
+		return false;
+	if(!m_connection.connect())
+		return false;
+	if(!m_connection.setBlocking(false))
+		return false;
+
 
 	return true;
 }
