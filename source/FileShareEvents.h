@@ -22,7 +22,8 @@ enum EventType {
 	FILEHOSTINFO_EVENT,
     PACKET_EVENT,
     NEWFILEINFO_EVENT,
-    NEWCHUNKINFO_EVENT
+    NEWCHUNKINFO_EVENT,
+	DISCONNECT_EVENT
 };
 
 struct BaseEvent {
@@ -125,5 +126,11 @@ struct NewChunkInfoEvent : BaseEvent {
     unsigned numPackets;
     unsigned filenameSize;
     const char * filename;
+    static types def[];
+};
+
+struct DisconnectEvent : BaseEvent {
+	DisconnectEvent() : BaseEvent(DISCONNECT_EVENT) {}
+
     static types def[];
 };

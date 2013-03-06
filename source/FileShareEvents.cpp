@@ -91,3 +91,8 @@ types NewChunkInfoEvent::def[] = {
     TYPE_UARRAYSIZE, TYPE_CHAR,
     TYPE_END
 };
+
+types DisconnectEvent::def[] = {
+    TYPE_UNSIGNED,
+    TYPE_END
+};

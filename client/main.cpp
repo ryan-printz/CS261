@@ -19,7 +19,7 @@ int main (void) {
         quit = client.Update();
     }
 
-    client.ShutDown();
+    //client.ShutDown();
 
     return 0;
 }

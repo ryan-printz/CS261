@@ -50,6 +50,8 @@ public:
 
     const char * GetLocalIp ();
 
+	void removeSession(HSession session);
+
 private:
     void Listen ();
     void Send(ubyte * buffer, unsigned bufferLen, HSession session);

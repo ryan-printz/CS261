@@ -201,6 +201,11 @@ void Engine::Send (unsigned char * buffer, unsigned bufferLen, HSession session)
         m_connectionManager->Broadcast(buffer, bufferLen);
 } 
 
+void Engine::removeSession(HSession session)
+{
+	if(f_closeSession)
+		f_closeSession(session);
+}
 //******************************************************************************
 const char * Engine::GetLocalIp () {
 	return Socket::localIP();

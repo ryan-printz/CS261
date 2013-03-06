@@ -194,7 +194,7 @@ FileShareClient::FileShareClient ()
 
 //******************************************************************************
 FileShareClient::~FileShareClient () {
-
+	ShutDown();
 }
 
 //******************************************************************************
@@ -271,6 +271,8 @@ bool FileShareClient::Initialize () {
 
 //******************************************************************************
 bool FileShareClient::ShutDown () {
+	DisconnectEvent e;
+    m_engine.Send(e, m_tcpServer);
     StopInputThread();
     m_engine.ShutDown();
     return true;
@@ -553,6 +555,8 @@ void FileShareClient::HandleInputCommand (const std::string & command) {
             RequestFileListEvent e;
             m_engine.Send(e, m_tcpServer);
         }
+		else if (tokens[0] == "QUIT")
+			m_quit = true;
 		else
 		{
 			PrintStringEvent e;

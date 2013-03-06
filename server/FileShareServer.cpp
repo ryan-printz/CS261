@@ -57,6 +57,11 @@ void ReceiveEventCallback (HSession session, ubyte * data) {
 			p.unpack(e, data);
 			s_server->HandleFileHostInfoRequest(e, session);
 		} break;
+
+	case DISCONNECT_EVENT:
+		{
+			s_server->m_engine.removeSession(session);
+        } break;
     default:
         printf("Unsupported event type '%u' sent to receive callback", eType);
 		printf("Session: %s \n", s_server->m_engine.GetConnectionsInfo()->GetSessionInfo(session).c_str());
