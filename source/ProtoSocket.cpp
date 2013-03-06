@@ -71,7 +71,15 @@ bool ProtoSocket::connect()
 
 bool ProtoSocket::connect(const NetAddress * address)
 {
-	return (sizeof(uint) == Socket::send((ubyte*)&ProtoHeader::CONNECTION_MESSAGE, sizeof(uint), const_cast<NetAddress*>(address)));
+	ubyte buffer[sizeof(ProtoHeader) + sizeof(uint)];
+
+	ProtoHeader temp;
+	
+	memcpy(buffer, &temp, sizeof(ProtoHeader));
+	memcpy(buffer + sizeof(ProtoHeader), (ubyte*)&ProtoHeader::CONNECTION_MESSAGE, sizeof(uint));
+
+	bool test = ((sizeof(uint) + sizeof(ProtoHeader)) == Socket::send(buffer, sizeof(uint) + sizeof(ProtoHeader), const_cast<NetAddress*>(address)));
+	return test;
 }
 
 int ProtoSocket::send(ubyte * buffer, uint len)
@@ -96,7 +104,7 @@ int ProtoSocket::send(ubyte * buffer, uint len, const NetAddress * address)
 	memcpy(packet, &m_header, sizeof(ProtoHeader));
 	memcpy(packet + sizeof(ProtoHeader), buffer, std::min(len, MAX_PACKET_SIZE - sizeof(ProtoHeader)));
 
-	return Socket::send(buffer, std::min(len+sizeof(ProtoHeader), MAX_PACKET_SIZE));
+	return Socket::send(packet, std::min(len+sizeof(ProtoHeader), MAX_PACKET_SIZE));
 }
 
 int ProtoSocket::receive(ubyte * buffer, uint len)
@@ -160,7 +168,7 @@ void ProtoSocket::receiveSort()
 	// nothing to receive
 	if( p.packetSize == SOCKET_ERROR && m_error == WSAEWOULDBLOCK )
 		return;
-
+	
 	// client disconnected.
 	else if( p.packetSize == 0 )
 	{
