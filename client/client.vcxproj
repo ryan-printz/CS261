@@ -113,6 +113,7 @@
     <ClCompile Include="..\source\InputThreading.cpp" />
     <ClCompile Include="..\source\Listener.cpp" />
     <ClCompile Include="..\source\ProtoConnection.cpp" />
+    <ClCompile Include="..\source\ProtoSocket.cpp" />
     <ClCompile Include="..\source\SequenceNumber.cpp" />
     <ClCompile Include="..\source\Serialization.cpp" />
     <ClCompile Include="..\source\Socket.cpp" />

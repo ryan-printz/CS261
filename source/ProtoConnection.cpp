@@ -38,7 +38,10 @@ bool ProtoConnection::accept(Socket * socket)
 	ProtoSocket accepted = plistener->acceptProto();
 
 	if( !accepted.invalid() )
+	{
 		m_connection = accepted;
+		m_server = true;
+	}
 
 	return !accepted.invalid();
 }

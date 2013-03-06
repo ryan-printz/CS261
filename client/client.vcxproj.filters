@@ -56,6 +56,9 @@
     <ClCompile Include="..\source\DecoratorConnectionManager.cpp">
       <Filter>source</Filter>
     </ClCompile>
+    <ClCompile Include="..\source\ProtoSocket.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\source\Chunk.h">
