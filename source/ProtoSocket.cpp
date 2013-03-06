@@ -104,7 +104,7 @@ int ProtoSocket::send(ubyte * buffer, uint len, const NetAddress * address)
 	memcpy(packet, &m_header, sizeof(ProtoHeader));
 	memcpy(packet + sizeof(ProtoHeader), buffer, std::min(len, MAX_PACKET_SIZE - sizeof(ProtoHeader)));
 
-	return Socket::send(packet, std::min(len+sizeof(ProtoHeader), MAX_PACKET_SIZE));
+	return Socket::send(packet, std::min(len+sizeof(ProtoHeader), MAX_PACKET_SIZE), address) - sizeof(ProtoHeader);
 }
 
 int ProtoSocket::receive(ubyte * buffer, uint len)

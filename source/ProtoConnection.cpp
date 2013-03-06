@@ -6,7 +6,7 @@
 #include <bitset>
 
 ProtoConnection::ProtoConnection()
-	: m_connected(false), m_useFlowControl(true), m_local(1)
+	: m_connected(false), m_useFlowControl(false), m_local(1)
 {
 	m_stats.m_ackedPackets = m_stats.m_lostPackets 
 						   = m_stats.m_receivedPackets 
@@ -48,7 +48,7 @@ bool ProtoConnection::accept(Socket * socket)
 
 bool ProtoConnection::connect(const char * IP, uint port)
 {
-	m_connection.initializeProto(Socket::localIP(), port, AF_INET);
+	m_connection.initializeProto(IP, port, AF_INET);
 	m_connection.connect();
 	m_connection.setBlocking(false);
 
@@ -85,8 +85,6 @@ int ProtoConnection::send(ubyte * buffer, uint len, ubyte flags)
 // send a packet to the "connected" 
 int ProtoConnection::noFlowSend(ubyte * buffer, uint len, ubyte flags)
 {
-	ubyte packet[ProtoSocket::MAX_PACKET_SIZE];
-
 	ProtoHeader header;
 	header.m_sequence = m_local;
 	header.m_ack	  = m_remote;
@@ -97,7 +95,7 @@ int ProtoConnection::noFlowSend(ubyte * buffer, uint len, ubyte flags)
 
 	int sent = 0;
 
-	if((sent = m_connection.send(packet, len)) != len )
+	if((sent = m_connection.send(buffer, len)) != len)
 		return -1;
 
 	std::cout << "Packet Header: Sequence number " << header.m_sequence.m_sequenceNumber

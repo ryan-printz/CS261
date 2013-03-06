@@ -227,7 +227,7 @@ int Socket::send(const ubyte * buffer, uint size)
 	return sent;
 }
 
-int Socket::send(const ubyte * buffer, uint size, NetAddress * address)
+int Socket::send(const ubyte * buffer, uint size, const NetAddress * address)
 {
 	int sent = ::sendto(m_socket, (char*)buffer, size, 0, (SOCKADDR*)address, sizeof(NetAddress));
 
