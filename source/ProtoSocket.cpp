@@ -11,6 +11,8 @@ ProtoSocket& ProtoSocket::operator=(const ProtoSocket & rhs)
 	m_packetSize	= rhs.m_packetSize;
 	m_isInitialized = rhs.m_isInitialized;
 
+	m_address = rhs.m_address;
+
 	return *this;
 }
 

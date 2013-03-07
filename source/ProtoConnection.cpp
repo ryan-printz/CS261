@@ -199,10 +199,10 @@ int ProtoConnection::receive(ubyte * buffer, uint len, int drop)
 
 	// don't return keep alive packets.
 	// handle disconnect messages.
-	if( received == sizeof(uint) && *(uint*)(packet + headerSize) == ProtoHeader::KEEP_ALIVE_MESSAGE )
+	if( received == sizeof(uint) && *(uint*)(packet) == ProtoHeader::KEEP_ALIVE_MESSAGE )
 		return -1;
 
-	memcpy(buffer, packet + headerSize + sizeof(uint), received -= sizeof(uint));
+	memcpy(buffer, packet + sizeof(uint), received -= sizeof(uint));
 
 	return received;
 }
