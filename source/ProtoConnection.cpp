@@ -297,7 +297,7 @@ void ProtoConnection::update(float dt)
 
 	// remove all the sent packets that have been around for longer than 2 * timeout
 	// used to determine round trip time.
-	while( !m_ackedPackets.empty() && m_sentPackets.front().m_time > 2 * m_timeout )
+	while( !m_sentPackets.empty() && m_sentPackets.front().m_time > 2 * m_timeout )
 		m_ackedPackets.pop_front();
 
 	// if a packet takes more than timeout time to be acked, it has been dropped.

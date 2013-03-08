@@ -10,8 +10,9 @@ ProtoSocket& ProtoSocket::operator=(const ProtoSocket & rhs)
 {
 	m_packetSize	= rhs.m_packetSize;
 	m_isInitialized = rhs.m_isInitialized;
-
-	m_address = rhs.m_address;
+	m_socket		= rhs.m_socket;
+	m_address		= rhs.m_address;
+	m_isBlocking	= rhs.m_isBlocking;
 
 	return *this;
 }
