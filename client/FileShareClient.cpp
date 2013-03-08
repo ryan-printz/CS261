@@ -368,7 +368,7 @@ bool FileShareClient::UpdateTransferSession (TransferSession & tSession) {
     // reset wait timers and variables
     tSession.m_waitCount = 0;
 
-    if (chunk->IsComplete()) {
+    if (chunk->IsSendComplete()) {
         if (fileFrame->IsFinalChunk()) {
             // we are done
             return false;
@@ -466,7 +466,7 @@ void FileShareClient::InsertPacket (const PacketEvent & e, HSession session) {
 
         tSession->m_fileFrame.m_Chunk.InsertPacket(newPacket, e.packetNum);
 
-		if(e.packetNum == e.totalPackets - 1)
+		if(tSession->m_fileFrame.m_Chunk.IsReceiveComplete())
 		{
 			printf("Writing Chunk %d", tSession->m_fileFrame.m_CurrentChunk);
 			tSession->m_fileFrame.WriteChunk(std::string(e.filename, e.filenameSize));
@@ -490,11 +490,11 @@ void FileShareClient::HandleInputCommand (const std::string & command) {
          std::back_inserter<std::vector<std::string> >(tokens));
 	if(tokens.size())
 	{
-		if(tokens[0] == "GETFILE")
+		if(tokens[0] == "#get")
 		{
 			if(tokens.size() < 3)
 			{
-				printf("Please use the format GETFILE <filename> <connectionID>\n");
+				printf("Please use the format #get <filename> <connectionID>\n");
 			}
 			else
 			{
@@ -506,7 +506,7 @@ void FileShareClient::HandleInputCommand (const std::string & command) {
 				m_engine.Send(e, m_tcpServer);
 			}
 		}
-		else if(tokens[0] == "LISTCONNECTIONS")
+		else if(tokens[0] == "#connections")
 		{
 			ListConnectionsEvent e;
 		
@@ -514,11 +514,11 @@ void FileShareClient::HandleInputCommand (const std::string & command) {
 
 			//m_engine.Send(e, m_tcpServer);
 		}
-		else if(tokens[0] == "SHOWINFO")
+		else if(tokens[0] == "#info")
 		{
 			if(tokens.size() < 2)
 			{
-				printf("Please use the format SHOWINFO <connectionID>\n");
+				printf("Please use the format #info <connectionID>\n");
 			}
 			else
 			{
@@ -528,11 +528,11 @@ void FileShareClient::HandleInputCommand (const std::string & command) {
 				ReceiveEventCallback(nullptr, (ubyte*)&e);
 			}
 		}
-		else if(tokens[0] == "DECORATE")
+		else if(tokens[0] == "#decorate")
 		{
 			if(tokens.size() < 2)
 			{
-				printf("Please use the format DECORATE <connectionID> [DROP|LATENCY] [highModifier] [lowModifier]\n");
+				printf("Please use the format #decorate <connectionID> [DROP|LATENCY] [highModifier] [lowModifier]\n");
 			}
 			else
 			{
@@ -555,12 +555,12 @@ void FileShareClient::HandleInputCommand (const std::string & command) {
 				ReceiveEventCallback(nullptr, (ubyte*)&e);
 			}
 		}
-        else if (tokens[0] == "LISTFILES")
+		else if (tokens[0] == "#files")
         {
             RequestFileListEvent e;
             m_engine.Send(e, m_tcpServer);
         }
-		else if (tokens[0] == "QUIT")
+		else if (tokens[0] == "quit")
 			m_quit = true;
 		else
 		{

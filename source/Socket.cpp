@@ -269,7 +269,7 @@ int Socket::receive(ubyte * buffer, uint size, NetAddress * address)
 		return 0;
 	}
 	else if( received == SOCKET_ERROR )
-	{
+	{ 
 		m_error = WSAGetLastError();
 		return received;
 	}

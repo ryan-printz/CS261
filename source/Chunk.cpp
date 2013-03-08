@@ -3,6 +3,7 @@
 Chunk::Chunk()
     : m_CurrentPacket(-1)
     , m_TotalPackets(0)
+	, m_ReceivedPackets(0)
     , m_InsertedArray(false)
 {
 }
@@ -59,12 +60,18 @@ void Chunk::InsertPacket( std::vector<char>& new_packet, unsigned packetNum )
         m_Array[i+offset] = new_packet[i];
     }
 
+	m_ReceivedPackets++;
     m_InsertedArray[packetNum] = true;
 }
 
-bool Chunk::IsComplete( void )
+bool Chunk::IsSendComplete( void )
 {
     return (m_CurrentPacket == m_TotalPackets-1);
+}
+
+bool Chunk::IsReceiveComplete(void)
+{
+	return m_ReceivedPackets == m_TotalPackets;
 }
 
 int Chunk::GetPacketId( void )

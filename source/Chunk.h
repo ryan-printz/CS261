@@ -16,8 +16,8 @@ public:
   std::vector<char> GetPacket( unsigned packetNum );
   int GetPacketId( void );
   
-
-  bool IsComplete( void );
+  bool IsSendComplete( void );
+  bool IsReceiveComplete( void );
 
   // Chunk array
   std::vector<char> m_Array;
@@ -27,5 +27,6 @@ public:
 
   // Self explanatory =/
   int m_TotalPackets;
+  int m_ReceivedPackets;
   unsigned m_CurrentPacket;
 };
