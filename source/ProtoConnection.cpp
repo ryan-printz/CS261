@@ -72,7 +72,7 @@ bool ProtoConnection::cleanup()
 int ProtoConnection::send(ubyte * buffer, uint len, ubyte flags)
 {
 	if( !m_useFlowControl )
-		return noFlowSend(buffer, len, flags);
+		return noFlowSend(buffer, len, flags | ProtoHeader::PROTO_HIGH );
 
 	FlowPacket fp;
 	memcpy( fp.m_buffer, buffer, len );
@@ -101,9 +101,9 @@ int ProtoConnection::noFlowSend(ubyte * buffer, uint len, ubyte flags)
 	if((sent = m_connection.send(buffer, len)) != len)
 		return -1;
 
-	std::cout << "Packet Header: Sequence number " << header.m_sequence.m_sequenceNumber
-	<< ", Ack " << header.m_ack.m_sequenceNumber
-	<< ", Acks " << std::bitset<32>((int)header.m_acks) 
+	std::cout << "Sent Packet Header: Sequence number " << header.m_sequence.m_sequenceNumber
+	//<< ", Ack " << header.m_ack.m_sequenceNumber
+	//<< ", Acks " << std::bitset<32>((int)header.m_acks) 
 	<< ", Flags " << std::bitset<CHAR_BIT>(header.m_flags) << std::endl;
 	
 	if( flags & ProtoHeader::PROTO_HIGH )
@@ -115,6 +115,7 @@ int ProtoConnection::noFlowSend(ubyte * buffer, uint len, ubyte flags)
 
 		repack.m_size = len + sizeof(SequenceNumber);
 		repack.m_sequence = header.m_sequence;
+		repack.m_time = 0.0f;
 
 		m_resend.insert( repack );
 	}
@@ -298,7 +299,7 @@ void ProtoConnection::update(float dt)
 	// remove all the sent packets that have been around for longer than 2 * timeout
 	// used to determine round trip time.
 	while( !m_sentPackets.empty() && m_sentPackets.front().m_time > 2 * m_timeout )
-		m_ackedPackets.pop_front();
+		m_sentPackets.pop_front();
 
 	// if a packet takes more than timeout time to be acked, it has been dropped.
 	while( !m_unackedPackets.empty() && m_unackedPackets.front().m_time > m_timeout )

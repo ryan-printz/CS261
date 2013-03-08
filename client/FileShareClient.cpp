@@ -456,7 +456,10 @@ void FileShareClient::InsertPacket (const PacketEvent & e, HSession session) {
     }
 
     if (found) {
-        if (tSession->m_fileFrame.m_Chunk.m_InsertedArray[e.packetNum])
+		if(tSession->m_fileFrame.m_CurrentChunk + 1 != e.packetNum)
+			
+		
+		if (tSession->m_fileFrame.m_Chunk.m_InsertedArray[e.packetNum])
             return; // already have packet saved
 
         std::vector<char> newPacket;

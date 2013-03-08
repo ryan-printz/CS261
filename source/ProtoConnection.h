@@ -67,6 +67,9 @@ struct ResendPacket
 class ResendOrderedQueue : public std::list<ResendPacket>
 {
 public:
+	ResendOrderedQueue() : std::list<ResendPacket>()
+	{}
+
 	bool has(SequenceNumber no) const
 	{
 		for(const_iterator packet = begin(); packet != end(); ++packet)
