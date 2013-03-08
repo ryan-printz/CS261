@@ -168,10 +168,10 @@ int ProtoConnection::receive(ubyte * buffer, uint len, int drop)
 	// drop duplicate packets.
 	if( m_receivedPackets.has( header.m_sequence ) )
 		return -1;
-
+	int resentShift = 0;
 	if( header.m_flags & ProtoHeader::PROTO_RESENT )
 	{
-		SequenceNumber * old = reinterpret_cast<SequenceNumber*>(packet + headerSize);
+		SequenceNumber * old = reinterpret_cast<SequenceNumber*>(packet);
 		received -= sizeof(SequenceNumber);
 
 		PacketInfo resentInfo;
@@ -180,6 +180,7 @@ int ProtoConnection::receive(ubyte * buffer, uint len, int drop)
 		resentInfo.m_size	  = sizeof(SequenceNumber);
 
 		m_receivedPackets.insert(resentInfo);
+		resentShift = sizeof(SequenceNumber);
 	}
 
 	PacketInfo info;
@@ -202,7 +203,7 @@ int ProtoConnection::receive(ubyte * buffer, uint len, int drop)
 	if( received == sizeof(uint) && *(uint*)(packet) == ProtoHeader::KEEP_ALIVE_MESSAGE )
 		return -1;
 
-	memcpy(buffer, packet + sizeof(uint), received -= sizeof(uint));
+	memcpy(buffer, packet + sizeof(uint) + resentShift, received -= sizeof(uint));
 
 	return received;
 }
@@ -386,9 +387,15 @@ void ProtoConnection::useAck(SequenceNumber ack, uint ackPack, bool resent)
 		return;
 
 	if( resent && m_resend.has(ack) )
-		for(auto rp = m_resend.begin(); rp != m_resend.end(); ++rp)
+		for(auto rp = m_resend.begin(); rp != m_resend.end();)
+		{
 			if( rp->m_sequence == ack )
-				m_resend.erase(rp);
+			{
+				rp = m_resend.erase(rp);
+			}
+			else
+				++rp;
+		}
 
 	auto packet = m_unackedPackets.begin();
 	while( packet != m_unackedPackets.end() )
