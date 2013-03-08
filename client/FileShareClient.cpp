@@ -426,6 +426,11 @@ void FileShareClient::BeginFileTransfer (const char * filename, HSession session
     filePath.append(filename);
     newFile->LoadChunk(filePath);
     newFile->m_FileSize = newFile->getFileLength(filePath);
+	if( newFile->m_FileSize == -1 )
+	{
+		printf("Can't send that file.\n");
+		return;
+	}
 
     NewFileInfoEvent e;
     e.filename = filename;

@@ -12,6 +12,11 @@ void FileFrame::LoadChunk(std::string& filename )
     FILE* loader = fopen(filename.c_str(), "rb");
     
     int filesize = getFileLength(filename);
+	if( filesize == -1 )	
+	{
+		printf("Nonexistent file.\n");
+		return;
+	}
 
     int chunkSize = 0;
     if(filesize < c_MaxChunkSize)
@@ -65,6 +70,10 @@ void FileFrame::WriteChunk(std::string & filename )
 int FileFrame::getFileLength( std::string &filename )
 {
     FILE* loader = fopen(filename.c_str(), "rb");
+
+	if( !loader )
+		return -1;
+
     fseek(loader, 0, SEEK_END);
     return ftell(loader);
 }

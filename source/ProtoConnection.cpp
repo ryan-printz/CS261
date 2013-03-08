@@ -55,7 +55,6 @@ bool ProtoConnection::connect(const char * IP, uint port)
 	if(!m_connection.setBlocking(false))
 		return false;
 
-
 	return true;
 }
 
