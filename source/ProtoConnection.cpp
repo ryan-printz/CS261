@@ -72,7 +72,7 @@ bool ProtoConnection::cleanup()
 int ProtoConnection::send(ubyte * buffer, uint len, ubyte flags)
 {
 	if( !m_useFlowControl )
-		return noFlowSend(buffer, len, flags | ProtoHeader::PROTO_HIGH );
+		return noFlowSend(buffer, len, flags ^ ProtoHeader::PROTO_HIGH );
 
 	FlowPacket fp;
 	memcpy( fp.m_buffer, buffer, len );
@@ -156,8 +156,7 @@ int ProtoConnection::receive(ubyte * buffer, uint len, int drop)
 	// adjust the received size appropriately.
 	ProtoHeader header = m_connection.getProtoHeader();
 
-	std::cout << "Received!" << std::endl;
-	std::cout << "Packet Header: Sequence number " << header.m_sequence.m_sequenceNumber
+	std::cout << "Received Packet Header: Sequence number " << header.m_sequence.m_sequenceNumber
 	<< ", Ack " << header.m_ack.m_sequenceNumber
 	<< ", Acks " << std::bitset<32>((int)header.m_acks) 
 	<< ", Flags " << std::bitset<CHAR_BIT>(header.m_flags) << std::endl;
@@ -168,6 +167,7 @@ int ProtoConnection::receive(ubyte * buffer, uint len, int drop)
 	// drop duplicate packets.
 	if( m_receivedPackets.has( header.m_sequence ) )
 		return -1;
+
 	int resentShift = 0;
 	if( header.m_flags & ProtoHeader::PROTO_RESENT )
 	{
@@ -204,6 +204,9 @@ int ProtoConnection::receive(ubyte * buffer, uint len, int drop)
 		return -1;
 
 	memcpy(buffer, packet + sizeof(uint) + resentShift, received -= sizeof(uint));
+
+	if( header.m_flags & ProtoHeader::PROTO_HIGH )
+		send((ubyte*)&ProtoHeader::KEEP_ALIVE_MESSAGE, sizeof(uint), ProtoHeader::PROTO_NORMAL | ProtoHeader::PROTO_HIGH);
 
 	return received;
 }
