@@ -108,7 +108,7 @@ public:
 
 struct FlowPacket
 {
-	ubyte	m_buffer[256];
+	ubyte	m_buffer[ProtoSocket::MAX_PACKET_SIZE];
 	ubyte	m_flags;
 	uint	m_size;
 };

@@ -288,41 +288,47 @@ bool FileShareClient::Update () {
         HandleInputCommand(commandBuffer);
     }
 
-    // update transfer sessions
-    auto tSession = m_transferSessions.begin();
+	float dt = m_timer.Update();
 
-    auto tTemp = tSession;
-    for (; tSession != m_transferSessions.end(); ++tSession) 
+    // update transfer sessions
+	if( m_updateTimer += dt > 0.032f )
 	{
-		if(!UpdateTransferSession(*tSession))
+		m_updateTimer -= 0.032f;
+
+		auto tSession = m_transferSessions.begin();
+		auto tTemp = tSession;
+		for (; tSession != m_transferSessions.end(); ++tSession) 
 		{
-			if(m_transferSessions.size() == 1)
+			if(!UpdateTransferSession(*tSession))
 			{
-				m_transferSessions.clear();
-				break;
-			}
-			
-			if(tSession == m_transferSessions.begin())
-			{
-				while(tSession != m_transferSessions.end() && !UpdateTransferSession(*tSession))
+				if(m_transferSessions.size() == 1)
 				{
-					m_transferSessions.erase(m_transferSessions.begin());
-					tSession = m_transferSessions.begin();
+					m_transferSessions.clear();
+					break;
+				}
+			
+				if(tSession == m_transferSessions.begin())
+				{
+					while(tSession != m_transferSessions.end() && !UpdateTransferSession(*tSession))
+					{
+						m_transferSessions.erase(m_transferSessions.begin());
+						tSession = m_transferSessions.begin();
+					}
+				}
+				else
+				{
+					tTemp = tSession;
+					--tTemp;
+					m_transferSessions.erase(tSession);
+					tSession = tTemp;
 				}
 			}
-			else
-			{
-				tTemp = tSession;
-				--tTemp;
-				m_transferSessions.erase(tSession);
-				tSession = tTemp;
-			}
 		}
-    }
+	}
 
 
     // update engine
-    m_engine.Update(m_timer.Update());
+    m_engine.Update(dt);
 
     return m_quit;
 }

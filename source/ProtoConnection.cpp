@@ -6,7 +6,7 @@
 #include <bitset>
 
 ProtoConnection::ProtoConnection()
-	: m_connected(false), m_useFlowControl(false), m_local(1)
+	: m_connected(false), m_useFlowControl(true), m_local(1)
 {
 	m_stats.m_ackedPackets = m_stats.m_lostPackets 
 						   = m_stats.m_receivedPackets 
@@ -15,7 +15,7 @@ ProtoConnection::ProtoConnection()
 							= m_stats.m_downBandwith = 0.0f;
 
 	m_keepAliveInterval = 0;
-	m_timeout = 0;
+	m_timeout = 2;
 
 	m_idleTimer = 0.0f;
 	m_modeTimer = 0.0f;
@@ -72,7 +72,7 @@ bool ProtoConnection::cleanup()
 int ProtoConnection::send(ubyte * buffer, uint len, ubyte flags)
 {
 	if( !m_useFlowControl )
-		return noFlowSend(buffer, len, flags ^ ProtoHeader::PROTO_HIGH );
+		return noFlowSend(buffer, len, flags);// ^ ProtoHeader::PROTO_HIGH );
 
 	FlowPacket fp;
 	memcpy( fp.m_buffer, buffer, len );
@@ -261,12 +261,12 @@ void ProtoConnection::updateFlowControl(float dt)
 		}
 	}
 
-	while( m_flowTimer > (1.0f / m_sendRate) / 1000.f && !m_flowControl.empty() )
+	while( m_flowTimer > (1.0f / m_sendRate) / 10000.f && !m_flowControl.empty() )
 	{
 		noFlowSend(m_flowControl.back().m_buffer, m_flowControl.back().m_size, m_flowControl.back().m_flags);
 		m_flowControl.pop_back();
 
-		m_flowTimer -= (1.0f/m_sendRate) / 1000.f;
+		m_flowTimer -= (1.0f/m_sendRate) / 10000.f;
 	}
 }
 
@@ -389,17 +389,6 @@ void ProtoConnection::useAck(SequenceNumber ack, uint ackPack, bool resent)
 	if( m_unackedPackets.empty() )
 		return;
 
-	if( resent && m_resend.has(ack) )
-		for(auto rp = m_resend.begin(); rp != m_resend.end();)
-		{
-			if( rp->m_sequence == ack )
-			{
-				rp = m_resend.erase(rp);
-			}
-			else
-				++rp;
-		}
-
 	auto packet = m_unackedPackets.begin();
 	while( packet != m_unackedPackets.end() )
 	{
@@ -419,6 +408,17 @@ void ProtoConnection::useAck(SequenceNumber ack, uint ackPack, bool resent)
 			// update stats.
 			++m_stats.m_ackedPackets;
 			updateRTT(packet->m_time);
+
+			// remove the packet from the resend queue if it exists there.
+			if( resent && m_resend.has(packet->m_sequence) )
+				for(auto rp = m_resend.begin(); rp != m_resend.end(); ++rp)
+				{
+					if( rp->m_sequence == ack )
+					{
+						rp = m_resend.erase(rp);
+						break;
+					}
+				}
 
 			// move the packet to the acked queue
 			// remove it from unacked.

@@ -63,6 +63,7 @@ private:
 private:
     Engine m_engine;
     Timer m_timer;
+	float m_updateTimer;
     bool m_quit;
 
     // Session management

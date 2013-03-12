@@ -159,7 +159,6 @@ void Engine::Update (float dt) {
     // Update connections;
     m_connectionManager->Update(dt);
 
-
     // Receive events
     const unsigned bufferLen = 1024;
     unsigned char buffer[bufferLen];
