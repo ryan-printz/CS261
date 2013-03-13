@@ -187,6 +187,7 @@ FileShareClient::FileShareClient ()
     : m_engine(SessionAcceptedCallback, SessionClosedCallback, ReceiveEventCallback)
     , m_quit(false) 
     , m_tcpServer(nullptr)
+	, m_updateTimer(0)
 {
     assert(s_client == nullptr);
     s_client = this;
@@ -291,15 +292,14 @@ bool FileShareClient::Update () {
 	float dt = m_timer.Update();
 
     // update transfer sessions
-	if( m_updateTimer += dt > 0.032f )
+	if( (m_updateTimer += dt) > 0.016f )
 	{
-		m_updateTimer -= 0.032f;
-
+		m_updateTimer -= 0.016f;
 		auto tSession = m_transferSessions.begin();
 		auto tTemp = tSession;
 		for (; tSession != m_transferSessions.end(); ++tSession) 
 		{
-			if(!UpdateTransferSession(*tSession))
+			if(!UpdateTransferSession(*tSession, m_updateTimer + 0.016f))
 			{
 				if(m_transferSessions.size() == 1)
 				{
@@ -309,7 +309,7 @@ bool FileShareClient::Update () {
 			
 				if(tSession == m_transferSessions.begin())
 				{
-					while(tSession != m_transferSessions.end() && !UpdateTransferSession(*tSession))
+					while(tSession != m_transferSessions.end() && !UpdateTransferSession(*tSession, m_updateTimer + 0.016f))
 					{
 						m_transferSessions.erase(m_transferSessions.begin());
 						tSession = m_transferSessions.begin();
@@ -334,7 +334,7 @@ bool FileShareClient::Update () {
 }
 
 //******************************************************************************
-bool FileShareClient::UpdateTransferSession (TransferSession & tSession) {
+bool FileShareClient::UpdateTransferSession (TransferSession & tSession, float dt) {
     // no need to update if receiving
     if (!tSession.m_isSender)
         return true;
@@ -344,7 +344,8 @@ bool FileShareClient::UpdateTransferSession (TransferSession & tSession) {
 
     if (!fileFrame->m_Ready) {
 
-        if (!tSession.m_waitTimer.Update(m_timer.GetFrameTime()))
+        //if (!tSession.m_waitTimer.Update(m_timer.GetFrameTime()))
+		if (!tSession.m_waitTimer.Update(dt))
             return true;
 
         //if (++tSession.m_waitCount > m_maxWaitCount)

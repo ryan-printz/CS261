@@ -6,7 +6,7 @@
 #include <bitset>
 
 ProtoConnection::ProtoConnection()
-	: m_connected(false), m_useFlowControl(true), m_local(1)
+	: m_connected(false), m_useFlowControl(false), m_local(1)
 {
 	m_stats.m_ackedPackets = m_stats.m_lostPackets 
 						   = m_stats.m_receivedPackets 

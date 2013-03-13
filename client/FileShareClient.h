@@ -22,7 +22,7 @@ public:
         , m_filename(filename)
         , m_isSender(isSender)
         , m_ready(false)
-        , m_waitTimer(0, 1)
+        , m_waitTimer(0, .25f)
         , m_waitCount(0)
         , m_maxWaitCount(10) {}
     
@@ -57,7 +57,7 @@ private:
     void HandleInputCommand (const std::string & command);
     void InitiateFileTransfer (const FileHostInfoEvent & e);
     void BeginFileTransfer (const char * filename, HSession session);
-    bool UpdateTransferSession (TransferSession & tSession);
+    bool UpdateTransferSession (TransferSession & tSession, float dt);
     void InsertPacket (const PacketEvent & e, HSession session);
 
 private:
