@@ -24,6 +24,7 @@
 #include "../source/Utils.hpp"
 
 FileShareClient * s_client = nullptr;
+bool headers = false;
 
 // callbacks
 //******************************************************************************
@@ -290,16 +291,16 @@ bool FileShareClient::Update () {
     }
 
 	float dt = m_timer.Update();
-
+	float delay = 0.032f;
     // update transfer sessions
-	if( (m_updateTimer += dt) > 0.016f )
+	if( (m_updateTimer += dt) > delay )
 	{
-		m_updateTimer -= 0.016f;
+		m_updateTimer -= delay;
 		auto tSession = m_transferSessions.begin();
 		auto tTemp = tSession;
 		for (; tSession != m_transferSessions.end(); ++tSession) 
 		{
-			if(!UpdateTransferSession(*tSession, m_updateTimer + 0.016f))
+			if(!UpdateTransferSession(*tSession, m_updateTimer + delay))
 			{
 				if(m_transferSessions.size() == 1)
 				{
@@ -309,7 +310,7 @@ bool FileShareClient::Update () {
 			
 				if(tSession == m_transferSessions.begin())
 				{
-					while(tSession != m_transferSessions.end() && !UpdateTransferSession(*tSession, m_updateTimer + 0.016f))
+					while(tSession != m_transferSessions.end() && !UpdateTransferSession(*tSession, m_updateTimer + delay))
 					{
 						m_transferSessions.erase(m_transferSessions.begin());
 						tSession = m_transferSessions.begin();
@@ -478,8 +479,13 @@ void FileShareClient::InsertPacket (const PacketEvent & e, HSession session) {
 
 		if(tSession->m_fileFrame.m_Chunk.IsReceiveComplete())
 		{
-			printf("Writing Chunk %d", tSession->m_fileFrame.m_CurrentChunk);
-			tSession->m_fileFrame.WriteChunk(std::string(e.filename, e.filenameSize));
+			std::string fileName(m_storePath);
+			fileName.append(e.filename, e.filenameSize);
+			//printf("Writing Chunk %d\n", tSession->m_fileFrame.m_CurrentChunk);
+			//tSession->m_fileFrame.WriteChunk(std::string(e.filename, e.filenameSize));
+			tSession->m_fileFrame.WriteChunk(fileName);
+			if((tSession->m_fileFrame.m_TotalChunks + 1) == tSession->m_fileFrame.m_CurrentChunk)
+				printf("File Transfer Complete\n");
 		}
     }
     else {
@@ -570,6 +576,8 @@ void FileShareClient::HandleInputCommand (const std::string & command) {
             RequestFileListEvent e;
             m_engine.Send(e, m_tcpServer);
         }
+		else if (tokens[0] == "#headers")
+            headers = !headers;
 		else if (tokens[0] == "quit")
 			m_quit = true;
 		else

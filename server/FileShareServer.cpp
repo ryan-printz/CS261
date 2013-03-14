@@ -17,7 +17,7 @@
 #include <iostream>
 
 static FileShareServer * s_server = nullptr;
-
+bool headers = false;
 // Callbacks
 //******************************************************************************
 void ReceiveEventCallback (HSession session, ubyte * data) {
